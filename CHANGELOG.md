@@ -7,4 +7,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ## [Unreleased]
 
 ### Added
-- The package and its command, with `--help` and `--version` only. TypeScript run directly by Node.js 22.18 or later, ESLint, tests with the test runner of Node.js, and CI on Node.js 22 and 24 ([365-daynight-vscode-theme-ext#100](https://github.com/mickaellherminez/365-daynight-vscode-theme-ext/issues/100)).
+- The package and its command, with `--help` and `--version` only. TypeScript run directly by Node.js 22.18 or later, ESLint, tests with the test runner of Node.js, CI on Node.js 22 and 24, and CodeQL ([365-daynight-vscode-theme-ext#100](https://github.com/mickaellherminez/365-daynight-vscode-theme-ext/issues/100)).
