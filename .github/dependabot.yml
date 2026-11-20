@@ -1,0 +1,27 @@
+# Weekly updates of the development tools and of the GitHub Actions.
+# Minor and patch updates are grouped, to keep the number of pull requests low.
+# @types/node follows the oldest Node.js version supported (22), and
+# typescript stays below 6.1 as long as typescript-eslint requires it.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+    groups:
+      development-tools:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
