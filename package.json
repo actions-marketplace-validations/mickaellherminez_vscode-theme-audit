@@ -1,0 +1,51 @@
+{
+  "name": "vscode-theme-audit",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Accessibility audit for VS Code color themes: WCAG contrast and color blindness simulations, for theme authors and CI.",
+  "keywords": [
+    "vscode",
+    "theme",
+    "color-theme",
+    "accessibility",
+    "a11y",
+    "wcag",
+    "contrast",
+    "color-blindness",
+    "open-vsx"
+  ],
+  "license": "MIT",
+  "author": "Mickaël Lherminez (https://mickaellherminez.net)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mickaellherminez/vscode-theme-audit.git"
+  },
+  "bugs": "https://github.com/mickaellherminez/vscode-theme-audit/issues",
+  "homepage": "https://github.com/mickaellherminez/vscode-theme-audit#readme",
+  "type": "module",
+  "bin": {
+    "vscode-theme-audit": "dist/cli.js"
+  },
+  "exports": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "node --test \"test/**/*.test.ts\"",
+    "check": "npm run lint && npm run typecheck && npm test && npm run build"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.20.5",
+    "eslint": "^10.15.0",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.73.0"
+  }
+}
