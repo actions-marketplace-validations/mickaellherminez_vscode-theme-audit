@@ -50,6 +50,18 @@ export function strArrCmp(a: readonly string[] | null, b: readonly string[] | nu
   return a.length - b.length;
 }
 
+/**
+ * Removes the leading and trailing commas of a selector, like the regular expressions of vscode-textmate
+ * (/^[,]+/ then /[,]+$/), in linear time: the second one is slow on long runs of commas.
+ */
+export function trimCommas(selector: string): string {
+  let start = 0;
+  while (selector[start] === ',') start++;
+  let end = selector.length;
+  while (end > start && selector[end - 1] === ',') end--;
+  return selector.slice(start, end);
+}
+
 /** Parses the rules of a theme (parseTheme of vscode-textmate). */
 export function parseRules(rules: readonly RawRule[]): ParsedRule[] {
   const result: ParsedRule[] = [];
@@ -57,7 +69,7 @@ export function parseRules(rules: readonly RawRule[]): ParsedRule[] {
     if (!entry.settings) return;
     let scopes: unknown[];
     if (typeof entry.scope === 'string') {
-      scopes = entry.scope.replace(/^[,]+/, '').replace(/[,]+$/, '').split(',');
+      scopes = trimCommas(entry.scope).split(',');
     } else if (Array.isArray(entry.scope)) {
       scopes = entry.scope as unknown[];
     } else {

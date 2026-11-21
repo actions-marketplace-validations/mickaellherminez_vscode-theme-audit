@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 
-import { FontStyle, TextMateTheme, parseRules, strArrCmp, strcmp } from '../src/textmate.ts';
+import { FontStyle, TextMateTheme, parseRules, strArrCmp, strcmp, trimCommas } from '../src/textmate.ts';
 import type { ParsedRule, RawRule } from '../src/textmate.ts';
 
 function fontStyleToString(fontStyle: number): string {
@@ -147,6 +147,18 @@ test('Theme parsing can parse', () => {
     rule('constant.numeric.dec', null, 9, FontStyle.None, '#0000ff', null),
     rule('foo', null, 10, FontStyle.None, '#CFA', null),
   ]);
+});
+
+test('leading and trailing commas are removed like vscode-textmate does, in linear time', () => {
+  const regexes = (s: string) => s.replace(/^[,]+/, '').replace(/[,]+$/, '');
+  for (const selector of ['', ',', ',,,', 'a', ',a', 'a,', ',,a,b,,', 'a,,b', ' , a , ', ',,\n,a,\n,']) {
+    assert.equal(trimCommas(selector), regexes(selector), JSON.stringify(selector));
+  }
+  // A long run of commas before the end: the regular expression takes quadratic time, not this
+  const long = ','.repeat(200000) + 'a' + ','.repeat(200000) + 'b';
+  const start = performance.now();
+  assert.equal(trimCommas(long), 'a' + ','.repeat(200000) + 'b');
+  assert.ok(performance.now() - start < 1000);
 });
 
 test('Theme resolving strcmp works', () => {
