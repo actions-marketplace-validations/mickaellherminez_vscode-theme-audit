@@ -850,7 +850,9 @@
         "label": "Bearded Themanopia (Experimental)",
         "uiTheme": "hc-black",
         "file": "themes/bearded-theme-themanopia.json",
-        "warnings": []
+        "warnings": [
+          "themes/bearded-theme-themanopia.json: \"bearded-theme-themanopia.json\" is named \"bearded-theme-Themanopia.json\" on disk: VS Code finds this file on macOS and Windows, but not on Linux, where file names do not ignore case"
+        ]
       },
       {
         "label": "Bearded Theme Aquarelle Cymbidium",

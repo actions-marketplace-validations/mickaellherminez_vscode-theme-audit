@@ -31,6 +31,10 @@ What VS Code does, and the package with it:
 - A file with a `settings` array uses the old format: its rules without scope set some workbench colors, and the rest of the file is ignored.
 - In an extension, a theme without `uiTheme` is dark (`vs-dark`), and a theme without `label` takes its file name.
 
+Where the package departs from VS Code, so that the audit gives the same result on every system:
+
+- A theme file or an `include` whose path differs from the file name only by case (`theme.json` for `Theme.json`) is found by VS Code on macOS and Windows, where file names usually ignore case, but not on Linux. The package reads it on every system, with a warning. Bearded Theme 10.1.0, in the corpus, has one.
+
 ## Token colors
 
 VS Code does not choose the color of a token itself: it gives the TextMate rules of the theme to [vscode-textmate](https://github.com/microsoft/vscode-textmate), which colors the code. `src/textmate.ts` ports how vscode-textmate matches a scope (`src/theme.ts`, commit `98cc6331dc`), with its tests in `test/textmate.test.ts`. `src/tokens.ts` adds what VS Code does before (`tokenColors` in `colorThemeData.ts`): a first rule with the editor colors, or their defaults; rules without scope left out; colors written in full and in uppercase; colors for log files when the theme sets none.
