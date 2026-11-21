@@ -103,6 +103,11 @@ export class TokenColors {
     this.textMate = new TextMateTheme(textMateRules(theme, this.type));
   }
 
+  /** Whether a rule of the theme sets the color of this scope, rather than the editor color (no parent scopes). */
+  colors(scope: string): boolean {
+    return (this.textMate.match([scope])?.foreground ?? null) !== null;
+  }
+
   /** Style of a token, from its scopes, outermost first: ['source.ts', 'meta.block.ts', 'keyword.control.ts']. */
   style(scopes: readonly string[]): TokenStyle {
     const { fontStyle, foreground, background } = this.textMate.resolve(scopes);

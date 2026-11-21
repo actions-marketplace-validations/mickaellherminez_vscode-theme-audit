@@ -19,12 +19,24 @@ npx vscode-theme-audit .                                   # every theme of an e
 
 Today, only `--help` and `--version` work.
 
-## What it will check
+## What it checks
 
-The same measures as the audit of 365 Day & Night:
+The same measures as the audit of 365 Day & Night, with the same results on its 48 themes:
 
-- **Contrast** ([WCAG 2.2](https://www.w3.org/TR/WCAG22/#contrast-minimum)) of the text and of each syntax color on its backgrounds.
-- **Color blindness:** syntax colors and alerts (errors, warnings, Git changes) must stay distinct with protanopia, deuteranopia and tritanopia simulations, with several published models (Machado et al. 2009, Brettel et al. 1997, Viénot et al. 1999), measured with CIEDE2000.
+- **Contrast** ([WCAG 2.2](https://www.w3.org/TR/WCAG22/#contrast-minimum)) of the text and of each syntax color on its backgrounds: the editor and its selections, the terminal, the panels, the widgets. 4.5:1 for text, 7:1 in high contrast themes. In the terminal, the color measured is the one VS Code shows after its minimum contrast of 4.5:1.
+- **Styles** ([WCAG 1.4.1](https://www.w3.org/TR/WCAG22/#use-of-color)), for information: comments in italics, invalid code underlined, deprecated code struck through, links underlined, Markdown headings, bold and italics.
+- **Color blindness:** syntax colors and alerts (errors, warnings, Git changes, test results, Git graph lines) must stay distinct with protanopia, deuteranopia and tritanopia simulations, with several published models (Machado et al. 2009, Brettel et al. 1997, Viénot et al. 1999), measured with CIEDE2000. Achromatopsia is measured for information.
+- **Strict mode:** the rules of 365 Day & Night on top: every color a check uses must be set by the theme, the main text needs 7:1, the styles are required, the terminal is measured without the help of VS Code, some recent keys and semantic rules are required, and the themes of one type in an extension must look different from each other.
+
+The command does not run the checks yet ([#9](https://github.com/mickaellherminez/vscode-theme-audit/issues/9)). From the sources:
+
+```ts
+import { auditTheme, isFailure, loadTheme } from './src/index.ts';
+
+const audit = auditTheme(loadTheme('themes/my-theme.json'), 'vs-dark');
+audit.checks.filter((check) => isFailure(check));        // contrast and styles under their minimum
+audit.distinctions.filter((pair) => pair.status === 'fail'); // colors that color blindness confuses
+```
 
 There will be no score, ranking or badge before a pilot with theme authors.
 
@@ -61,6 +73,7 @@ missingKeys(colors, ['editor.background', 'inlineChat.background'], { strict: tr
 - **Measurements and simulations, not people.** No calculation replaces testing with the people concerned.
 - **Thresholds are project rules.** WCAG sets the contrast minimums. The color distinction threshold is a practical rule, not a standard.
 - **JSON themes only.** TextMate theme files (`.tmTheme`), an older format, are not read yet.
+- **Default settings of VS Code.** The terminal is measured with its default minimum contrast (`terminal.integrated.minimumContrastRatio`: 4.5), and the selected text of the terminal without the adjustments of xterm.js.
 - **Settings of the user are not read.** The audit measures the theme as published, without `workbench.colorCustomizations`, `editor.tokenColorCustomizations` or `editor.semanticTokenColorCustomizations`. The semantic token types and scopes added by extensions other than the built-in JavaScript and TypeScript ones are not read either.
 - **Defaults of one version of VS Code.** The defaults change from one version to the next, a few keys at a time. The version used is written in the package (`VSCODE_SOURCE`).
 - **Colors of the theme, not choices made in the code of a view.** When a key has no color, some views choose another one in their own code: the terminal, for example, takes the background of the panel when `terminal.background` has none. The audit gives the color of the key.
