@@ -1,0 +1,30 @@
+{
+  "name": "vscode-theme-audit-oracle",
+  "displayName": "vscode-theme-audit oracle themes",
+  "description": "Test themes of vscode-theme-audit: VS Code shows them, and its colors are compared with those of the package.",
+  "version": "0.0.0",
+  "publisher": "vscode-theme-audit",
+  "license": "MIT",
+  "engines": { "vscode": "^1.60.0" },
+  "categories": ["Themes"],
+  "contributes": {
+    "themes": [
+      { "label": "Oracle Light", "uiTheme": "vs", "path": "./themes/light.json" },
+      { "label": "Oracle Dark", "uiTheme": "vs-dark", "path": "./themes/dark.json" },
+      { "label": "Oracle High Contrast Dark", "uiTheme": "hc-black", "path": "./themes/hc-dark.json" },
+      { "label": "Oracle High Contrast Light", "uiTheme": "hc-light", "path": "./themes/hc-light.json" }
+    ],
+    "colors": [
+      {
+        "id": "oracle.accent",
+        "description": "A color of the extension, from another color, with its own high contrast colors.",
+        "defaults": { "light": "focusBorder", "dark": "#C586C0", "highContrast": "#FFD700", "highContrastLight": "#7A0099" }
+      },
+      {
+        "id": "oracle.fallback",
+        "description": "A color of the extension without high contrast colors: VS Code uses the light and dark ones.",
+        "defaults": { "light": "#00800080", "dark": "editor.foreground" }
+      }
+    ]
+  }
+}

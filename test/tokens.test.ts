@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 
 import type { Theme } from '../src/theme.ts';
-import { EDITOR_DEFAULTS, TokenColors, normalizeColor, textMateRules } from '../src/tokens.ts';
+import { TokenColors, normalizeColor, textMateRules } from '../src/tokens.ts';
 
 function theme(colors: Record<string, string>, tokenColors: Theme['tokenColors']): Theme {
   return { files: [], colors, tokenColors, semanticTokenColors: [], semanticHighlighting: false, warnings: [] };
@@ -27,9 +27,15 @@ describe('the rules given to vscode-textmate', () => {
   });
 
   test('without editor colors, the defaults of VS Code for the theme type', () => {
+    const defaults = {
+      light: { foreground: '#333333', background: '#FFFFFF' },
+      dark: { foreground: '#BBBBBB', background: '#1E1E1E' },
+      hcDark: { foreground: '#FFFFFF', background: '#000000' },
+      hcLight: { foreground: '#292929', background: '#FFFFFF' },
+    };
     for (const type of ['light', 'dark', 'hcDark', 'hcLight'] as const) {
       const rules = textMateRules(theme({}, []), type);
-      assert.deepEqual(rules[0], { settings: EDITOR_DEFAULTS[type] }, type);
+      assert.deepEqual(rules[0], { settings: defaults[type] }, type);
     }
   });
 

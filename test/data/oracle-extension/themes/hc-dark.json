@@ -1,0 +1,13 @@
+{
+  // A high contrast dark theme: VS Code derives most colors from contrastBorder and activeContrastBorder
+  "name": "Oracle High Contrast Dark",
+  "type": "hc",
+  "colors": {
+    "contrastBorder": "#6FC3DF",
+    "contrastActiveBorder": "#F38518",
+    "editor.background": "#000000",
+    "foreground": "#FFFFFF",
+    "editorWidget.background": "#0C141F",
+    "button.background": "#000000"
+  }
+}

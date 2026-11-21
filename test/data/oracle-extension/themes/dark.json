@@ -1,0 +1,19 @@
+{
+  // A dark theme with an include and "default", and colors with transparency
+  "name": "Oracle Dark",
+  "type": "dark",
+  "include": "./dark-base.json",
+  "colors": {
+    "editor.background": "#1B2230",
+    "editor.foreground": "#D8DEE9",
+    "focusBorder": "default",
+    "selection.background": "#4C566A80",
+    "editor.selectionBackground": "#88C0D04D",
+    "list.activeSelectionBackground": "#3B4252",
+    "checkbox.background": "#2E3440",
+    "checkbox.foreground": "#ECEFF4",
+    "terminal.ansiBlue": "#81A1C1",
+    "statusBar.background": "#3B4252",
+    "activityBarBadge.background": "#8FBCBB"
+  }
+}

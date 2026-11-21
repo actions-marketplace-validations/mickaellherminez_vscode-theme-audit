@@ -1,5 +1,5 @@
 // Semantic token styles. The first tests are ported from tokenStyleResolving.test.ts of VS Code
-// (microsoft/vscode 671d82d2d8, MIT License: see THIRD-PARTY-NOTICES.md), with the rules of the user settings
+// (microsoft/vscode 1.147.0, MIT License: see THIRD-PARTY-NOTICES.md), with the rules of the user settings
 // written in the theme instead: VS Code applies both the same way.
 
 import assert from 'node:assert/strict';

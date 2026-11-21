@@ -1,5 +1,5 @@
 // The style of a semantic token in a theme, as VS Code shows it: the rules of `semanticTokenColors`, then the
-// TextMate scopes that VS Code probes for each token type. Ported from microsoft/vscode 671d82d2d8:
+// TextMate scopes that VS Code probes for each token type. Ported from microsoft/vscode 1.147.0:
 // tokenClassificationRegistry.ts (selectors, scores, default scopes), colorThemeData.ts (getTokenStyle,
 // resolveScopes, readSemanticTokenRule), textMateScopeMatcher.ts (scope selectors), and the `semanticTokenScopes`
 // of the built-in extensions `javascript` and `typescript-basics`.
@@ -7,7 +7,8 @@
 
 import { isSemanticStyleObject, readColor } from './theme.ts';
 import type { TextMateRule, Theme, UiTheme } from './theme.ts';
-import { THEME_TYPES, normalizeColor, textMateRules, workbenchColor } from './tokens.ts';
+import { THEME_TYPES } from './theme.ts';
+import { normalizeColor, textMateRules, workbenchColor } from './tokens.ts';
 import type { TokenStyle } from './tokens.ts';
 
 /** A token as a language server classifies it: `variable` with `readonly`, in `typescript`. */
