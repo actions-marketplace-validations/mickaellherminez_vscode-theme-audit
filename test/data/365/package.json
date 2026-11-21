@@ -1,0 +1,263 @@
+{
+  "name": "365-daynight-vscode-theme-ext",
+  "displayName": "365 Day & Night – Monthly Accessible Themes",
+  "publisher": "mickaellherminez",
+  "version": "1.0.6",
+  "license": "MIT",
+  "contributes": {
+    "themes": [
+      {
+        "label": "365 01-January Light",
+        "uiTheme": "vs",
+        "path": "./themes/365-01-light-theme.json"
+      },
+      {
+        "label": "365 01-January High Contrast",
+        "uiTheme": "hc-black",
+        "path": "./themes/365-01-hc-dark-theme.json"
+      },
+      {
+        "label": "365 01-January High Contrast Light",
+        "uiTheme": "hc-light",
+        "path": "./themes/365-01-hc-light-theme.json"
+      },
+      {
+        "label": "365 01-January Dark",
+        "uiTheme": "vs-dark",
+        "path": "./themes/365-01-dark-theme.json"
+      },
+      {
+        "label": "365 02-February High Contrast",
+        "uiTheme": "hc-black",
+        "path": "./themes/365-02-hc-dark-theme.json"
+      },
+      {
+        "label": "365 02-February High Contrast Light",
+        "uiTheme": "hc-light",
+        "path": "./themes/365-02-hc-light-theme.json"
+      },
+      {
+        "label": "365 02-February Light",
+        "uiTheme": "vs",
+        "path": "./themes/365-02-light-theme.json"
+      },
+      {
+        "label": "365 02-February Dark",
+        "uiTheme": "vs-dark",
+        "path": "./themes/365-02-dark-theme.json"
+      },
+      {
+        "label": "365 03-March High Contrast",
+        "uiTheme": "hc-black",
+        "path": "./themes/365-03-hc-dark-theme.json"
+      },
+      {
+        "label": "365 03-March High Contrast Light",
+        "uiTheme": "hc-light",
+        "path": "./themes/365-03-hc-light-theme.json"
+      },
+      {
+        "label": "365 03-March Light",
+        "uiTheme": "vs",
+        "path": "./themes/365-03-light-theme.json"
+      },
+      {
+        "label": "365 03-March Dark",
+        "uiTheme": "vs-dark",
+        "path": "./themes/365-03-dark-theme.json"
+      },
+      {
+        "label": "365 04-April High Contrast",
+        "uiTheme": "hc-black",
+        "path": "./themes/365-04-hc-dark-theme.json"
+      },
+      {
+        "label": "365 04-April High Contrast Light",
+        "uiTheme": "hc-light",
+        "path": "./themes/365-04-hc-light-theme.json"
+      },
+      {
+        "label": "365 04-April Light",
+        "uiTheme": "vs",
+        "path": "./themes/365-04-light-theme.json"
+      },
+      {
+        "label": "365 04-April Dark",
+        "uiTheme": "vs-dark",
+        "path": "./themes/365-04-dark-theme.json"
+      },
+      {
+        "label": "365 05-May High Contrast",
+        "uiTheme": "hc-black",
+        "path": "./themes/365-05-hc-dark-theme.json"
+      },
+      {
+        "label": "365 05-May High Contrast Light",
+        "uiTheme": "hc-light",
+        "path": "./themes/365-05-hc-light-theme.json"
+      },
+      {
+        "label": "365 05-May Light",
+        "uiTheme": "vs",
+        "path": "./themes/365-05-light-theme.json"
+      },
+      {
+        "label": "365 05-May Dark",
+        "uiTheme": "vs-dark",
+        "path": "./themes/365-05-dark-theme.json"
+      },
+      {
+        "label": "365 06-June High Contrast",
+        "uiTheme": "hc-black",
+        "path": "./themes/365-06-hc-dark-theme.json"
+      },
+      {
+        "label": "365 06-June High Contrast Light",
+        "uiTheme": "hc-light",
+        "path": "./themes/365-06-hc-light-theme.json"
+      },
+      {
+        "label": "365 06-June Light",
+        "uiTheme": "vs",
+        "path": "./themes/365-06-light-theme.json"
+      },
+      {
+        "label": "365 06-June Dark",
+        "uiTheme": "vs-dark",
+        "path": "./themes/365-06-dark-theme.json"
+      },
+      {
+        "label": "365 07-July High Contrast",
+        "uiTheme": "hc-black",
+        "path": "./themes/365-07-hc-dark-theme.json"
+      },
+      {
+        "label": "365 07-July High Contrast Light",
+        "uiTheme": "hc-light",
+        "path": "./themes/365-07-hc-light-theme.json"
+      },
+      {
+        "label": "365 07-July Light",
+        "uiTheme": "vs",
+        "path": "./themes/365-07-light-theme.json"
+      },
+      {
+        "label": "365 07-July Dark",
+        "uiTheme": "vs-dark",
+        "path": "./themes/365-07-dark-theme.json"
+      },
+      {
+        "label": "365 08-August High Contrast",
+        "uiTheme": "hc-black",
+        "path": "./themes/365-08-hc-dark-theme.json"
+      },
+      {
+        "label": "365 08-August High Contrast Light",
+        "uiTheme": "hc-light",
+        "path": "./themes/365-08-hc-light-theme.json"
+      },
+      {
+        "label": "365 08-August Light",
+        "uiTheme": "vs",
+        "path": "./themes/365-08-light-theme.json"
+      },
+      {
+        "label": "365 08-August Dark",
+        "uiTheme": "vs-dark",
+        "path": "./themes/365-08-dark-theme.json"
+      },
+      {
+        "label": "365 09-September Light",
+        "uiTheme": "vs",
+        "path": "./themes/365-09-light-theme.json"
+      },
+      {
+        "label": "365 09-September Dark",
+        "uiTheme": "vs-dark",
+        "path": "./themes/365-09-dark-theme.json"
+      },
+      {
+        "label": "365 09-September High Contrast",
+        "uiTheme": "hc-black",
+        "path": "./themes/365-09-hc-dark-theme.json"
+      },
+      {
+        "label": "365 09-September High Contrast Light",
+        "uiTheme": "hc-light",
+        "path": "./themes/365-09-hc-light-theme.json"
+      },
+      {
+        "label": "365 10-October Light",
+        "uiTheme": "vs",
+        "path": "./themes/365-10-light-theme.json"
+      },
+      {
+        "label": "365 10-October Dark",
+        "uiTheme": "vs-dark",
+        "path": "./themes/365-10-dark-theme.json"
+      },
+      {
+        "label": "365 10-October High Contrast",
+        "uiTheme": "hc-black",
+        "path": "./themes/365-10-hc-dark-theme.json"
+      },
+      {
+        "label": "365 10-October High Contrast Light",
+        "uiTheme": "hc-light",
+        "path": "./themes/365-10-hc-light-theme.json"
+      },
+      {
+        "label": "365 11-November Light",
+        "uiTheme": "vs",
+        "path": "./themes/365-11-light-theme.json"
+      },
+      {
+        "label": "365 11-November Dark",
+        "uiTheme": "vs-dark",
+        "path": "./themes/365-11-dark-theme.json"
+      },
+      {
+        "label": "365 11-November High Contrast",
+        "uiTheme": "hc-black",
+        "path": "./themes/365-11-hc-dark-theme.json"
+      },
+      {
+        "label": "365 11-November High Contrast Light",
+        "uiTheme": "hc-light",
+        "path": "./themes/365-11-hc-light-theme.json"
+      },
+      {
+        "label": "365 12-December Light",
+        "uiTheme": "vs",
+        "path": "./themes/365-12-light-theme.json"
+      },
+      {
+        "label": "365 12-December Dark",
+        "uiTheme": "vs-dark",
+        "path": "./themes/365-12-dark-theme.json"
+      },
+      {
+        "label": "365 12-December High Contrast",
+        "uiTheme": "hc-black",
+        "path": "./themes/365-12-hc-dark-theme.json"
+      },
+      {
+        "label": "365 12-December High Contrast Light",
+        "uiTheme": "hc-light",
+        "path": "./themes/365-12-hc-light-theme.json"
+      }
+    ],
+    "colors": [
+      {
+        "id": "365DayNight.statusBarButton",
+        "description": "Color of the 365 Day & Night status bar button: the month arrows, the month and the variant.",
+        "defaults": {
+          "dark": "statusBar.foreground",
+          "light": "statusBar.foreground",
+          "highContrast": "statusBar.foreground",
+          "highContrastLight": "statusBar.foreground"
+        }
+      }
+    ]
+  }
+}

@@ -19,3 +19,5 @@ export type { Classifier, SemanticRegistry, SemanticStyle } from './semantic.ts'
 export { Color, HSLA, RGBA, WorkbenchColors, extensionColors, missingKeys } from './colors.ts';
 export type { ColorDefaults, ColorOrigin, ColorRegistry, ColorTransform, ColorValue, MissingKey, WorkbenchColor } from './colors.ts';
 export { VSCODE_COLORS, VSCODE_SOURCE } from './vscode-colors.ts';
+export { DISTINCT_TOKENS, MIN_DELTA_E_2000, PRIORITY_KEYS, SEMANTIC_ROLES, TERMINAL_MINIMUM_CONTRAST, TOKEN_PROBES, auditTheme, auditVariety, hueFamily, isFailure, terminalColor, tokenColors, varietyFailures } from './audit.ts';
+export type { AuditOptions, Check, CheckStatus, Distinction, NamedTheme, PairDistance, ThemeAudit, Variety, VarietyMeasure } from './audit.ts';

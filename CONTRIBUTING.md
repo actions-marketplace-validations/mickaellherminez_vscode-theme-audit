@@ -87,6 +87,41 @@ What this does not cover: some views of VS Code choose another color in their ow
 
 The code ported from Microsoft keeps its MIT license notice: see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 
+## What the audit checks
+
+`src/audit.ts` ports the checks of [`audit.py`](https://github.com/mickaellherminez/365-daynight-vscode-theme-ext/blob/main/scripts/themes/audit.py) and [`variety.py`](https://github.com/mickaellherminez/365-daynight-vscode-theme-ext/blob/main/scripts/themes/variety.py) of 365 Day & Night. `auditTheme()` checks one theme, `auditVariety()` compares the themes of one type in an extension.
+
+| Check | What it measures | Why |
+| --- | --- | --- |
+| Contrast | The WCAG 2 contrast ratio of a text color on its background: the editor and its selections, find matches, line numbers, the terminal and its ANSI colors, the debug console, the side bar, lists, tabs, the status bar, buttons, inputs, widgets, notifications, menus, Git decorations, chat, testing, notebooks, merge editor, symbols, Git graph, command center, agent sessions, each syntax category and each semantic rule, on the background and on the selection. A transparent color is composed on what is under it | [WCAG 2.2](https://www.w3.org/TR/WCAG22/#contrast-minimum): 4.5:1 for text (AA), 3:1 for indicators, borders and icons. In high contrast themes, text needs 7:1 (AAA), and in strict mode the main text too (editor, terminal, side bar, notebook cells) |
+| Visible selection | The contrast between a selection, or the current line, and the background | Lower minimums (1.2 to 1.35; 2 or 3 in high contrast): project rules, to see where the selection is |
+| Styles (WCAG 1.4.1) | Comments in italics, invalid code underlined, deprecated code struck through (TextMate, and the semantic rule `*.deprecated`), links underlined, Markdown headings and bold in bold, Markdown italics in italics | [WCAG 1.4.1, use of color](https://www.w3.org/TR/WCAG22/#use-of-color): this information must not rely on color alone. A failure in strict mode only; otherwise information, since the syntax also shows these tokens (`//`, `#`...) and VS Code itself strikes through deprecated code and underlines errors (`editor.showDeprecated`, diagnostics) |
+| Color blindness | The CIEDE2000 difference between colors that must stay distinct: keyword, function, string, number, class, comment and variable; error, warning and info; added, modified and deleted; passed and failed tests; the 5 lines of the Git graph. In normal vision, and with every model of each deficiency (Machado 2009, Brettel 1997, Viénot 1999 for protanopia and deuteranopia, Brettel 1997 for tritanopia): the closest one counts | A difference of at least 7 is a project rule, not a standard. Models disagree, so a pair must stay distinct with all of them |
+| Achromatopsia | The same difference between the syntax colors, seen without color | Information only: without color, syntax colors often differ only in lightness |
+
+By default, the checks read the colors that VS Code shows: the theme, then the defaults of VS Code (see [Default colors](#default-colors)). A check whose color VS Code does not show at all is `missing`, which is information. Some views replace a missing color in their own code, and the checks do too: the terminal takes the background of the panel, and the cells of a notebook the editor background in high contrast. The terminal of VS Code also changes the color of each character until it reaches a contrast of 4.5:1 on the terminal background (`terminal.integrated.minimumContrastRatio`, 4.5 by default): the checks of the terminal text and of its ANSI colors measure that color, computed as xterm.js does (`terminalColor()`, ported from `rgba.ensureContrastRatio` of xterm.js 6.1.0-beta.337, the version of VS Code 1.147.0). In high contrast, where text needs 7:1, an ANSI color can still fail. The selected text of the terminal is measured on the selection as the theme writes it: xterm.js also turns an opaque selection into a transparent one and adjusts the selected text, which the package does not do yet. The semantic checks apply when the theme enables semantic highlighting, as VS Code shows semantic colors only then.
+
+**Strict mode** (`{ strict: true }`) applies the rules of 365 Day & Night:
+
+- the main text needs 7:1 (editor, terminal, side bar, notebook cells), the styles of WCAG 1.4.1 are failures, and the terminal is measured with the colors of the theme, without the minimum contrast of VS Code;
+- the checks read only the colors that the theme sets, and a missing one is a failure. The inline chat, notebook, command center and agent session colors still follow the defaults that VS Code derives from other keys, as `audit.py` does;
+- a syntax category that no rule of the theme colors is missing, except variables, which take the editor color;
+- the keys of `PRIORITY_KEYS` (recent surfaces whose defaults in VS Code ignore the theme) and the semantic rules of `SEMANTIC_ROLES` must be set; the status bar button of the extension (`365DayNight.statusBarButton`) must be readable, and distinct from the status bar text (CIE76 of at least 15);
+- the semantic checks apply even when the theme does not enable semantic highlighting;
+- `auditVariety()` (strict mode only, since its thresholds are those of the project): the themes of one type must look different from each other. Each pair is compared on the editor background (CIE76 of at least 8, 4 in high contrast), the side bar (7, 4 in high contrast), the accent of the activity bar badge (25), and the mean of 6 syntax colors (18); at most 3 themes may share a hue family (8 sectors of 45° of the CIELAB hue, or neutral). The status bar, the CIEDE2000 means and the color blindness simulations are information.
+
+Where the package and `audit.py` read a theme differently, the package follows VS Code: a rule for `keyword` also colors `keyword.operator`, while `audit.py` only takes the rules whose scope is exactly the one probed; the package also checks the symbol icons and ANSI colors that VS Code knows when the theme does not set them (not in strict mode). On the 48 themes of 365 Day & Night, these differences do not change any result.
+
+### Same results as 365 Day & Night
+
+`test/audit-parity.test.ts` runs the checks in strict mode on the 48 themes of 365 Day & Night and compares them with the results of `audit.py` and `variety.py` (`test/data/audit-reference.json`): the same checks in the same order, with the same status and minimum, the same pairs and models, and the same values to 0.01. The themes are copied in `test/data/365/`, under the MIT license of 365 Day & Night. To rebuild both from a clone of 365 Day & Night, at the commit to compare with:
+
+```sh
+python3 -I test/data/audit_reference.py ../365-daynight-vscode-theme-ext test/data
+```
+
+The script gives the labels in English, as the package writes them, and stops on a label it cannot translate: after a change of `audit.py`, add the translation, port the change to `src/audit.ts`, then run `npm test`. To go back to the previous results, check out `test/data/365/` and `test/data/audit-reference.json` from git.
+
 ## Checks
 
 | Command | What it does |

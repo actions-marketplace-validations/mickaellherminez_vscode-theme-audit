@@ -8,6 +8,8 @@ Parts of this package are ported from projects of Microsoft, under the MIT Licen
 - `src/vscode-colors.ts`: the default colors that [Visual Studio Code](https://github.com/microsoft/vscode) registers (1.147.0), extracted from its sources by `scripts/vscode-colors.ts`.
 - `src/theme.ts` and `src/tokens.ts`: rules of `colorThemeData.ts` and `themeCompatibility.ts` of [Visual Studio Code](https://github.com/microsoft/vscode) (1.147.0): how a color theme is loaded, which TextMate rules it gives, and the default colors involved.
 
+`terminalColor()` in `src/audit.ts`, and the expected colors of its test in `test/audit.test.ts`: from `rgba.ensureContrastRatio` in `src/common/Color.ts` of [xterm.js](https://github.com/xtermjs/xterm.js) 6.1.0-beta.337, the terminal of VS Code 1.147.0, under the MIT License: how the terminal changes the color of a text to reach its minimum contrast.
+
 ## vscode-textmate
 
 The MIT License (MIT)
@@ -55,3 +57,27 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+## xterm.js
+
+Copyright (c) 2017-2019, The xterm.js authors (https://github.com/xtermjs/xterm.js)
+Copyright (c) 2014-2016, SourceLair Private Company (https://www.sourcelair.com)
+Copyright (c) 2012-2013, Christopher Jeffrey (https://github.com/chjj/)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
