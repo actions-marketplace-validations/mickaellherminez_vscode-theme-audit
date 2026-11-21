@@ -137,8 +137,13 @@ class Session {
   private constructor(socket: WebSocket) {
     this.socket = socket;
     socket.addEventListener('message', (event) => {
-      const message = JSON.parse(String(event.data)) as { id?: number; result?: unknown };
-      if (message.id !== undefined) this.pending.get(message.id)?.(message.result);
+      const message = JSON.parse(String(event.data)) as { id?: unknown; result?: unknown };
+      // Only the answers to our own requests: a number id that one of them is waiting for
+      if (typeof message.id !== 'number') return;
+      const done = this.pending.get(message.id);
+      if (typeof done !== 'function') return;
+      this.pending.delete(message.id);
+      done(message.result);
     });
   }
 
