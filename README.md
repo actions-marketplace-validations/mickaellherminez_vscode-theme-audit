@@ -33,6 +33,7 @@ There will be no score, ranking or badge before a pilot with theme authors.
 - **Measurements and simulations, not people.** No calculation replaces testing with the people concerned.
 - **Thresholds are project rules.** WCAG sets the contrast minimums. The color distinction threshold is a practical rule, not a standard.
 - **JSON themes only.** TextMate theme files (`.tmTheme`), an older format, are not read yet.
+- **Settings of the user are not read.** The audit measures the theme as published, without `workbench.colorCustomizations`, `editor.tokenColorCustomizations` or `editor.semanticTokenColorCustomizations`. The semantic token types and scopes added by extensions other than the built-in JavaScript and TypeScript ones are not read either.
 - **Colors, not rendering.** The audit reads the theme files. It does not look at a rendered window, antialiasing or a display.
 
 ## Development

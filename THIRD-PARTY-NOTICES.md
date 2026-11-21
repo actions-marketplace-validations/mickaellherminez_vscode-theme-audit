@@ -3,6 +3,7 @@
 Parts of this package are ported from projects of Microsoft, under the MIT License:
 
 - `src/textmate.ts` and `test/textmate.test.ts`: from `src/theme.ts` and `src/tests/themes.test.ts` of [vscode-textmate](https://github.com/microsoft/vscode-textmate) (commit 98cc6331dc).
+- `src/semantic.ts` and the first tests of `test/semantic.test.ts`: from `tokenClassificationRegistry.ts`, `colorThemeData.ts`, `textMateScopeMatcher.ts` and `tokenStyleResolving.test.ts`, and the `semanticTokenScopes` of the built-in extensions `javascript` and `typescript-basics`, of [Visual Studio Code](https://github.com/microsoft/vscode) (commit 671d82d2d8): how a semantic token gets its style.
 - `src/theme.ts` and `src/tokens.ts`: rules of `colorThemeData.ts` and `themeCompatibility.ts` of [Visual Studio Code](https://github.com/microsoft/vscode) (commit 671d82d2d8): how a color theme is loaded, which TextMate rules it gives, and the default colors involved.
 
 ## vscode-textmate

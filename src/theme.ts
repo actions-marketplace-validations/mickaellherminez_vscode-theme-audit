@@ -121,7 +121,7 @@ export function readJsonc(file: string): unknown {
  * A color as VS Code reads it (Color.fromHex): '#' and 3, 4, 6 or 8 digits, otherwise red. A character that is not a
  * hexadecimal digit counts as 0. Both cases give a warning.
  */
-function readColor(value: string, file: string, key: string, warnings: ThemeWarning[]): string {
+export function readColor(value: string, file: string, key: string, warnings: ThemeWarning[]): string {
   if (!value.startsWith('#') || ![4, 5, 7, 9].includes(value.length)) {
     warnings.push({ file, message: `"${key}" is not a hexadecimal color (${JSON.stringify(value)}): VS Code shows ${INVALID_COLOR}` });
     return INVALID_COLOR;
@@ -151,6 +151,30 @@ function convertSettings(rules: unknown[], file: string, theme: Theme): void {
       }
       if (key !== 'foreground' && key !== 'background' && key !== 'fontStyle') Reflect.deleteProperty(settings, key);
     }
+  }
+}
+
+/**
+ * A style of `semanticTokenColors` as VS Code reads it (readSemanticTokenRule): a color, or an object with at least
+ * one of `foreground` or `fontStyle` (strings) or `bold`, `italic`, `underline`, `strikethrough` (booleans). Other
+ * values are ignored. A `foreground` that is not a string makes VS Code refuse the whole theme.
+ */
+export function isSemanticStyleObject(style: unknown): style is Record<string, unknown> {
+  return isObject(style) && (typeof style.foreground === 'string' || typeof style.fontStyle === 'string'
+    || ['bold', 'italic', 'underline', 'strikethrough'].some((key) => typeof style[key] === 'boolean'));
+}
+
+function checkSemanticStyle(selector: string, style: unknown, file: string, warnings: ThemeWarning[]): void {
+  const key = `semanticTokenColors: ${selector}`;
+  if (typeof style === 'string') {
+    readColor(style, file, key, warnings);
+  } else if (isSemanticStyleObject(style)) {
+    if (typeof style.foreground === 'string') readColor(style.foreground, file, key, warnings);
+    else if (style.foreground !== undefined) {
+      throw new ThemeError(file, `VS Code refuses this theme: the foreground of "${selector}" in 'semanticTokenColors' is not a string`);
+    }
+  } else {
+    warnings.push({ file, message: `"${key}" is neither a color nor a style: VS Code ignores it` });
   }
 }
 
@@ -195,7 +219,10 @@ function load(file: string, theme: Theme, chain: readonly string[]): void {
   }
 
   if (isObject(content.semanticTokenColors)) {
-    for (const [selector, style] of Object.entries(content.semanticTokenColors)) theme.semanticTokenColors.push({ selector, style, file });
+    for (const [selector, style] of Object.entries(content.semanticTokenColors)) {
+      checkSemanticStyle(selector, style, file, theme.warnings);
+      theme.semanticTokenColors.push({ selector, style, file });
+    }
   }
 }
 

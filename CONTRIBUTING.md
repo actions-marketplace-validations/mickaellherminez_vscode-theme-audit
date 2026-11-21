@@ -37,6 +37,16 @@ VS Code does not choose the color of a token itself: it gives the TextMate rules
 
 `test/textmate-oracle.test.ts` compares the port with vscode-textmate itself, a development dependency, on themes and scope paths generated at random with a fixed seed. vscode-textmate does not export its theme: a grammar with one pattern gives each scope path to its tokenizer, and the style is read back from the token metadata. If you change `src/textmate.ts`, this test must still pass.
 
+## Semantic tokens
+
+In many languages, a language server classifies names (a read-only `variable`, a `parameter`...) and VS Code styles them over the TextMate colors, when the theme sets `"semanticHighlighting": true`. `src/semantic.ts` ports how VS Code finds that style (`getTokenStyle` in `colorThemeData.ts`, `tokenClassificationRegistry.ts`):
+
+1. Each rule of `semanticTokenColors` that matches the token gets a score: 100 for its type (minus 1 per super type level), 100 per modifier, 10 for a language. For each property (color, bold, italic, underline, strikethrough), the best score wins, and the last rule wins a tie.
+2. For the properties still unset, VS Code probes TextMate scopes, such as `variable.other.constant` for `variable.readonly`, with the scope selectors of `textMateScopeMatcher.ts`. The built-in JavaScript and TypeScript extensions add their own scopes for their languages.
+3. A property that is still unset keeps the TextMate style of the token: `withSemantic()` combines both.
+
+`test/semantic.test.ts` starts with the tests of VS Code (`tokenStyleResolving.test.ts`). The `semanticTokenScopes` and token types of other extensions, and the user setting `editor.semanticTokenColorCustomizations`, are not read.
+
 The code ported from Microsoft keeps its MIT license notice: see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 
 ## Checks
