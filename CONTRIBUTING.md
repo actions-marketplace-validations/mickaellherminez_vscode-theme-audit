@@ -31,6 +31,14 @@ What VS Code does, and the package with it:
 - A file with a `settings` array uses the old format: its rules without scope set some workbench colors, and the rest of the file is ignored.
 - In an extension, a theme without `uiTheme` is dark (`vs-dark`), and a theme without `label` takes its file name.
 
+## Token colors
+
+VS Code does not choose the color of a token itself: it gives the TextMate rules of the theme to [vscode-textmate](https://github.com/microsoft/vscode-textmate), which colors the code. `src/textmate.ts` ports how vscode-textmate matches a scope (`src/theme.ts`, commit `98cc6331dc`), with its tests in `test/textmate.test.ts`. `src/tokens.ts` adds what VS Code does before (`tokenColors` in `colorThemeData.ts`): a first rule with the editor colors, or their defaults; rules without scope left out; colors written in full and in uppercase; colors for log files when the theme sets none.
+
+`test/textmate-oracle.test.ts` compares the port with vscode-textmate itself, a development dependency, on themes and scope paths generated at random with a fixed seed. vscode-textmate does not export its theme: a grammar with one pattern gives each scope path to its tokenizer, and the style is read back from the token metadata. If you change `src/textmate.ts`, this test must still pass.
+
+The code ported from Microsoft keeps its MIT license notice: see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+
 ## Checks
 
 | Command | What it does |

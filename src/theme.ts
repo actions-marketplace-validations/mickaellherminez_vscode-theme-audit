@@ -1,5 +1,6 @@
 // Reads a color theme the way VS Code does (src/vs/workbench/services/themes/common/colorThemeData.ts,
 // _loadColorTheme, and themeCompatibility.ts, convertSettings; checked on microsoft/vscode 671d82d2d8).
+// Copyright (c) Microsoft Corporation for the rules of VS Code. Licensed under the MIT License: see THIRD-PARTY-NOTICES.md.
 
 import { readFileSync } from 'node:fs';
 import { dirname, extname, resolve } from 'node:path';
