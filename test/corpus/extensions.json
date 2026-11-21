@@ -1,0 +1,105 @@
+{
+  "description": "The 20 most downloaded extensions of the Themes category of Open VSX on 20 November 2026, at fixed versions, with the SHA-256 of their .vsix. To change a version: node scripts/corpus.ts --update <id>@<version>",
+  "extensions": [
+    {
+      "id": "zhuangtongfa.material-theme",
+      "version": "3.20.7",
+      "sha256": "7d672be680049324c68b333065b370ecc001d0df0d233eba2b80fb301cdfbf05"
+    },
+    {
+      "id": "Catppuccin.catppuccin-vsc",
+      "version": "3.19.0",
+      "sha256": "ebf347664837edbe91c9920ff3d14c96d4a28beeec0b95137c76058326329780"
+    },
+    {
+      "id": "ms-vscode.cpptools-themes",
+      "version": "2.0.0",
+      "sha256": "ea51b10ea399b540db727a7f2714eee1a10be03099e42c69f2fab7554a645f18"
+    },
+    {
+      "id": "dracula-theme.theme-dracula",
+      "version": "2.25.1",
+      "sha256": "f4d8c28fc64874b1b959cc90dbd39c84d5d35c9cf203e32b7a758dc9abf5b1cb"
+    },
+    {
+      "id": "gitpod.gitpod-theme",
+      "version": "0.0.2",
+      "sha256": "09cc5ee29b956d9339d18cfed175fbf595c4c67ab4855e636f674102c732d832"
+    },
+    {
+      "id": "GitHub.github-vscode-theme",
+      "version": "6.3.5",
+      "sha256": "a85236a58ad490b1600ec5a0fd0cea7eec56fb9d33660a1ac82c6da639ad3af4"
+    },
+    {
+      "id": "monokai.theme-monokai-pro-vscode",
+      "version": "2.0.17",
+      "sha256": "3aa914b9e55047119412554cb13a77f44cdad14ed4772e7656f5fa393dd2ba2c"
+    },
+    {
+      "id": "teabyii.ayu",
+      "version": "1.6.0",
+      "sha256": "d4f31659bdb31deb6c877709cff0d7446da0c4bb1e934696cb70496aabe78e3e"
+    },
+    {
+      "id": "jdinhlife.gruvbox",
+      "version": "1.29.2",
+      "sha256": "9961716a5636b6f4c5725bd9c01873dded8c2f667ccb2227e8d11e12dc964d7b"
+    },
+    {
+      "id": "akamud.vscode-theme-onedark",
+      "version": "2.3.0",
+      "sha256": "46b7471523cc2c0fcf526ed63b87b502e4102f3c3cde68d9f2eae9c9887a2e85"
+    },
+    {
+      "id": "fisheva.eva-theme",
+      "version": "2.9.1",
+      "sha256": "6b346381fe88763e0f7de2a97e28d5ec0dde5a15251616a37e9b3df27ea5385e"
+    },
+    {
+      "id": "enkia.tokyo-night",
+      "version": "1.1.2",
+      "sha256": "79aaf590d5ad65ef1aac809b0e1981aa72e4992bf6a4e54bf9087e70f8aad264"
+    },
+    {
+      "id": "BeardedBear.beardedtheme",
+      "version": "10.1.0",
+      "sha256": "ecc92f2c469dce007b69fd3595889b10ea879fd6efce5a603131228900651330"
+    },
+    {
+      "id": "Dracula-2.dracula-2",
+      "version": "0.3.8",
+      "sha256": "c1cf2f50f673a7bc19645b0f724b8baed0f8fe82bcef30460c9984ff7b3d5fd0"
+    },
+    {
+      "id": "bastndev.lynx-theme",
+      "version": "5.4.0",
+      "sha256": "0c2d9bd7b7a2b95daa81830d6d270076d5d116771ee5fcdf1f5d10a4e6a5d96d"
+    },
+    {
+      "id": "mvllow.rose-pine",
+      "version": "2.15.2",
+      "sha256": "cd0b96b878258a0ec49aefb67a55e6a3d1b9304355b91582c0c73b3d9c4478ae"
+    },
+    {
+      "id": "sdras.night-owl",
+      "version": "2.1.1",
+      "sha256": "5ddeaad8d4afedbd1d6d514ed3641c92963270db558119401de5e1cc6f3bc1e3"
+    },
+    {
+      "id": "beem.monochromator",
+      "version": "0.36.2",
+      "sha256": "7eca55c451ae9edfee38b84a2eeb14e5d8b0a8dff2a4c1004de1cc29b2a0c061"
+    },
+    {
+      "id": "akamud.vscode-theme-onelight",
+      "version": "2.3.0",
+      "sha256": "63175d5437ec48531898b26017162ae243d03bae21f747f5a7523b953b5a9e11"
+    },
+    {
+      "id": "vira.vsc-vira-theme",
+      "version": "2026.9.6",
+      "sha256": "3af972a27698fb812a6e6bc30b3028e91781d7c9762affc8a8a3ee702bfab006"
+    }
+  ]
+}

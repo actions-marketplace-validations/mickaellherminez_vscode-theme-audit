@@ -1,5 +1,5 @@
 # Runs the checks on every branch push and pull request, on the two Node.js
-# versions that the package supports.
+# versions that the package supports, then the corpus test.
 
 name: CI
 
@@ -45,3 +45,29 @@ jobs:
 
       - name: The package contains what it should
         run: npm pack --dry-run
+
+  corpus:
+    # 20 theme extensions of Open VSX at fixed versions (test/corpus/extensions.json).
+    # Their .vsix files are cached, and downloaded again only when the list changes.
+    # The test checks the SHA-256 of each file, from the cache or not.
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [22, 24]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - run: npm ci
+
+      - uses: actions/cache@v6
+        with:
+          path: .cache/corpus
+          key: corpus-${{ hashFiles('test/corpus/extensions.json') }}
+
+      - name: Corpus test
+        run: npm run test:corpus

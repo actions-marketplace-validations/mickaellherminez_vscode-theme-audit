@@ -128,17 +128,41 @@ The script gives the labels in English, as the package writes them, and stops on
 
 The JSON format is described by [`schema/report-v1.schema.json`](schema/report-v1.schema.json) (JSON Schema 2020-12), published with the package. The schema refuses unknown fields, so a field added to the report must be added to the schema in the same pull request. Format 1 can gain fields; removing a field or changing its meaning means format 2: a new schema file, `REPORT_FORMAT` in `src/report.ts`, and a line in the CHANGELOG. `test/cli.test.ts` checks every option and exit code, and validates each JSON report against the schema with [Ajv](https://ajv.js.org/), a development dependency.
 
+## The corpus
+
+The package is also tested on real themes: the 20 most downloaded extensions of the Themes category of [Open VSX](https://open-vsx.org/) on 20 November 2026, 178 theme files. [`test/corpus/extensions.json`](test/corpus/extensions.json) fixes the version of each one and the SHA-256 of its `.vsix`, so that the test does not change when an extension publishes a new version.
+
+The `.vsix` files are not committed: not every license of these extensions allows it, some have terms of their own and one gives no license. `npm run corpus` (`scripts/corpus.ts`) downloads those that are missing from Open VSX into `.cache/corpus/`, ignored by git, and checks their SHA-256. It needs the network once; after that, the files come from the cache.
+
+```sh
+npm run test:corpus   # download what is missing, then run test/corpus/corpus.test.ts
+```
+
+The test extracts each `.vsix` into a temporary folder as VS Code installs it: with [yauzl](https://github.com/thejoshwolfe/yauzl), the zip library of VS Code (a development dependency), only the entries under `extension`. It audits each extension in both modes and checks that nothing crashes, that each report is valid against its schema, and that the themes and warnings are those of [`test/corpus/expected.json`](test/corpus/expected.json): the empty colors of Monokai Pro, the `null` values of Night Owl, the arrays of GitHub Theme. It does not compare the measures: the other tests do that. `npm test` does not run it, so that it stays offline.
+
+To move an extension of the corpus to another version, in a pull request of its own:
+
+```sh
+node scripts/corpus.ts --update <publisher.name>@<version>
+npm run test:corpus
+```
+
+The script downloads that version and checks its SHA-256 against the one that Open VSX publishes. It then writes the version and the SHA-256 in `extensions.json` and writes `expected.json` again. The pull request shows the change of the themes and the warnings, to be explained in its description. After a change of the package that changes the themes or the warnings on purpose, `node scripts/corpus.ts --expected` writes `expected.json` again.
+
+To go back, check out `test/corpus/` from git and run `npm run test:corpus`: the previous version is downloaded again. To free the space (about 23 MB), delete `.cache/corpus/`.
+
 ## Checks
 
 | Command | What it does |
 | --- | --- |
 | `npm run lint` | ESLint, with the strict type-checked rules of typescript-eslint |
 | `npm run typecheck` | TypeScript, without writing files |
-| `npm test` | The tests of `test/`, with the test runner of Node.js |
+| `npm test` | The tests of `test/*.test.ts`, with the test runner of Node.js, without the network |
 | `npm run build` | Compiles `src/` to `dist/`, the only folder published to npm |
 | `npm run check` | All of the above, in this order |
+| `npm run test:corpus` | The corpus test, after downloading what the cache lacks |
 
-The [CI workflow](.github/workflows/ci.yml) runs them on every push and pull request, with Node.js 22 and 24. It also runs the built command and lists the content of the package (`npm pack --dry-run`).
+The [CI workflow](.github/workflows/ci.yml) runs them on every push and pull request, with Node.js 22 and 24. It also runs the built command and lists the content of the package (`npm pack --dry-run`). Its corpus job keeps the `.vsix` files in a GitHub Actions cache, downloaded again only when `extensions.json` changes.
 
 The [CodeQL workflow](.github/workflows/codeql.yml) looks for security problems in the TypeScript code and in the workflows, on every pull request to `main`, on `main` and every Monday. Its results are in the Security tab.
 
