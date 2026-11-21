@@ -1,30 +1,14 @@
 // The color of a token in a theme, as VS Code shows it with TextMate grammars: the rules that VS Code gives to
-// vscode-textmate (tokenColors in colorThemeData.ts of microsoft/vscode 671d82d2d8), then the matching of
+// vscode-textmate (tokenColors in colorThemeData.ts of microsoft/vscode 1.147.0), then the matching of
 // src/textmate.ts.
 // Copyright (c) Microsoft Corporation for the rules of VS Code. Licensed under the MIT License: see THIRD-PARTY-NOTICES.md.
 
+import { WorkbenchColors } from './colors.ts';
 import { parse, toHex } from './color.ts';
 import { FontStyle, TextMateTheme } from './textmate.ts';
 import type { RawRule } from './textmate.ts';
-import type { Theme, UiTheme } from './theme.ts';
-
-/** Theme type of VS Code, the key of its default colors. */
-export type ThemeType = 'light' | 'dark' | 'hcDark' | 'hcLight';
-
-export const THEME_TYPES: Readonly<Record<UiTheme, ThemeType>> = {
-  'vs': 'light', 'vs-dark': 'dark', 'hc-black': 'hcDark', 'hc-light': 'hcLight',
-};
-
-/**
- * Defaults of editor.background and editor.foreground (editorColors.ts of VS Code). In High Contrast Light, the
- * default of editor.foreground is the color `foreground` of the theme, whose own default is #292929 (baseColors.ts).
- */
-export const EDITOR_DEFAULTS: Readonly<Record<ThemeType, { background: string; foreground: string }>> = {
-  light: { background: '#FFFFFF', foreground: '#333333' },
-  dark: { background: '#1E1E1E', foreground: '#BBBBBB' },
-  hcDark: { background: '#000000', foreground: '#FFFFFF' },
-  hcLight: { background: '#FFFFFF', foreground: '#292929' },
-};
+import { THEME_TYPES } from './theme.ts';
+import type { Theme, ThemeType, UiTheme } from './theme.ts';
 
 /** Colors of log files that VS Code adds after the rules of a theme that does not set token.info-token. */
 const DEFAULT_TOKEN_RULES: Readonly<Record<ThemeType, readonly RawRule[]>> = {
@@ -74,13 +58,14 @@ export function workbenchColor(value: string): string {
 
 /** The TextMate rules that VS Code gives to vscode-textmate for a theme. */
 export function textMateRules(theme: Theme, type: ThemeType): RawRule[] {
-  const foreground = theme.colors['editor.foreground'] ?? (type === 'hcLight' ? theme.colors.foreground : undefined);
-  const background = theme.colors['editor.background'];
+  // The editor colors of the theme, or their defaults: in High Contrast Light, the default of editor.foreground is
+  // the color `foreground` of the theme
+  const colors = new WorkbenchColors(theme, type);
   // The default rule (no scope) is always first; the default rules of the theme itself are ignored
   const rules: RawRule[] = [{
     settings: {
-      foreground: normalizeColor(foreground ? workbenchColor(foreground) : EDITOR_DEFAULTS[type].foreground),
-      background: normalizeColor(background ? workbenchColor(background) : EDITOR_DEFAULTS[type].background),
+      foreground: normalizeColor(colors.color('editor.foreground')?.toHex()),
+      background: normalizeColor(colors.color('editor.background')?.toHex()),
     },
   }];
   const add = (rule: RawRule) => {

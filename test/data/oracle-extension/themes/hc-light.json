@@ -1,0 +1,13 @@
+{
+  // A high contrast light theme without editor.foreground: VS Code takes foreground
+  "name": "Oracle High Contrast Light",
+  "type": "hcLight",
+  "colors": {
+    "contrastBorder": "#0F4A85",
+    "foreground": "#1A1A1A",
+    "editor.background": "#FFFFFF",
+    "editor.selectionBackground": "#0F4A8533",
+    "list.inactiveSelectionBackground": "#E0E0E0",
+    "badge.background": "#0F4A85"
+  }
+}

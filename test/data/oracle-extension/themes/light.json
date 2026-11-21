@@ -1,0 +1,17 @@
+{
+  // A light theme that sets a few colors, so that VS Code derives the others from them
+  "name": "Oracle Light",
+  "type": "light",
+  "colors": {
+    "editor.background": "#FDF6E3",
+    "editor.foreground": "#586E75CC",
+    "foreground": "#2E3440",
+    "focusBorder": "#0B5CAD",
+    "editorWidget.background": "#EEE8D5",
+    "editorSuggestWidget.selectedBackground": "#D9E8F5",
+    "list.focusHighlightForeground": "#A0522D",
+    "button.background": "blue",
+    "sideBar.background": "#F4EEDC",
+    "badge.background": "#B58900"
+  }
+}
