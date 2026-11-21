@@ -2,7 +2,7 @@
 
 Accessibility audit for VS Code color themes, for theme authors and their CI: WCAG contrast of the text and the code, and color pairs that must stay distinct with color blindness simulations.
 
-> **Status: in progress, not published on npm yet.** This first version only sets up the package. The reading engine and the checks come next, as described in [issue #100](https://github.com/mickaellherminez/365-daynight-vscode-theme-ext/issues/100).
+> **Status: in progress, not published on npm yet.** The reading engine, the checks and the command work from the sources. The first release on npm is planned for version 0.1.0.
 
 ## Where it comes from
 
@@ -10,14 +10,37 @@ The audit was first written for [365 Day & Night](https://github.com/mickaellher
 
 The themes of the Visual Studio Marketplace and of [Open VSX](https://open-vsx.org/) use the same format, so the audit also covers the editors that use Open VSX, such as VSCodium, Cursor or Gitpod.
 
-## Planned usage
+## Usage
+
+Once published, with `npx vscode-theme-audit`. Until then, from a clone of this repository (Node.js 22.18 or later, then `npm ci`), with `node src/cli.ts`:
 
 ```sh
-npx vscode-theme-audit themes/my-theme-color-theme.json   # one theme file
-npx vscode-theme-audit .                                   # every theme of an extension folder
+node src/cli.ts path/to/my-theme-color-theme.json   # one theme file
+node src/cli.ts path/to/my-extension                 # every theme of an extension folder (its package.json)
+node src/cli.ts path/to/my-extension --json > audit.json   # the report as JSON, for CI
+node src/cli.ts path/to/my-extension --strict        # the rules of 365 Day & Night
 ```
 
-Today, only `--help` and `--version` work.
+Several files and folders can be given at once. A theme file takes its type (light, dark, high contrast) and its name from the extension that declares it, the nearest `package.json` above it. Without one, its type comes from its `type` field (`light`, `dark`, `hc`, `hcLight`), or it is audited as dark, as VS Code shows it, with a warning.
+
+| Option | Effect |
+| --- | --- |
+| `--json` | Prints the report as JSON instead of text: format 1, described by [`schema/report-v1.schema.json`](schema/report-v1.schema.json), which the package contains. It gives every check, not only the failures |
+| `--strict` | Applies the rules of 365 Day & Night (see below) |
+| `-h`, `--help` | Shows the help |
+| `-v`, `--version` | Shows the version |
+
+The text report lists, for each theme, the warnings, each failed check with its two colors as shown, the value measured and the minimum, each pair of colors that a vision confuses, then a summary of the theme. A last line counts the themes, those with failures and the failures.
+
+| Exit code | Meaning |
+| --- | --- |
+| `0` | Every check passes |
+| `1` | A check fails, or a pair of colors is confused (in strict mode, also a missing color or a variety failure) |
+| `2` | A theme cannot be read, a path does not exist, a folder has no themes, or an option is unknown. The other themes are still audited and reported |
+
+Outside strict mode, a color that VS Code does not show, and the styles of WCAG 1.4.1, are information: they never change the exit code.
+
+The JSON format has a version (`format`). New fields can appear in format 1; a field removed or changing meaning gives format 2, with a new schema.
 
 ## What it checks
 
@@ -28,13 +51,13 @@ The same measures as the audit of 365 Day & Night, with the same results on its 
 - **Color blindness:** syntax colors and alerts (errors, warnings, Git changes, test results, Git graph lines) must stay distinct with protanopia, deuteranopia and tritanopia simulations, with several published models (Machado et al. 2009, Brettel et al. 1997, Viénot et al. 1999), measured with CIEDE2000. Achromatopsia is measured for information.
 - **Strict mode:** the rules of 365 Day & Night on top: every color a check uses must be set by the theme, the main text needs 7:1, the styles are required, the terminal is measured without the help of VS Code, some recent keys and semantic rules are required, and the themes of one type in an extension must look different from each other.
 
-The command does not run the checks yet ([#9](https://github.com/mickaellherminez/vscode-theme-audit/issues/9)). From the sources:
+The same checks from the sources, without the command:
 
 ```ts
 import { auditTheme, isFailure, loadTheme } from './src/index.ts';
 
 const audit = auditTheme(loadTheme('themes/my-theme.json'), 'vs-dark');
-audit.checks.filter((check) => isFailure(check));        // contrast and styles under their minimum
+audit.checks.filter((check) => isFailure(check));             // checks under their minimum
 audit.distinctions.filter((pair) => pair.status === 'fail'); // colors that color blindness confuses
 ```
 

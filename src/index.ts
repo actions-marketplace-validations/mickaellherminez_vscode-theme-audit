@@ -21,3 +21,5 @@ export type { ColorDefaults, ColorOrigin, ColorRegistry, ColorTransform, ColorVa
 export { VSCODE_COLORS, VSCODE_SOURCE } from './vscode-colors.ts';
 export { DISTINCT_TOKENS, MIN_DELTA_E_2000, PRIORITY_KEYS, SEMANTIC_ROLES, TERMINAL_MINIMUM_CONTRAST, TOKEN_PROBES, auditTheme, auditVariety, hueFamily, isFailure, terminalColor, tokenColors, varietyFailures } from './audit.ts';
 export type { AuditOptions, Check, CheckStatus, Distinction, NamedTheme, PairDistance, ThemeAudit, Variety, VarietyMeasure } from './audit.ts';
+export { REPORT_FORMAT, auditPaths, exitCode, textReport } from './report.ts';
+export type { Report, ThemeReport, ThemeSummary, VarietyReport } from './report.ts';

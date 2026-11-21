@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/mickaellherminez/vscode-theme-audit/main/schema/report-v1.schema.json",
+  "title": "vscode-theme-audit report, format 1",
+  "description": "The output of `vscode-theme-audit --json`. Format 1 can gain fields; a field removed or changing meaning gives format 2.",
+  "type": "object",
+  "required": ["format", "tool", "vscode", "strict", "minimumDeltaE2000", "warnings", "themes", "variety", "summary"],
+  "additionalProperties": false,
+  "properties": {
+    "format": { "const": 1, "description": "The version of this format." },
+    "tool": {
+      "type": "object",
+      "required": ["name", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "const": "vscode-theme-audit" },
+        "version": { "type": "string", "description": "The version of the package that wrote the report." }
+      }
+    },
+    "vscode": {
+      "type": "object",
+      "description": "The version of VS Code whose default colors and rules the audit follows.",
+      "required": ["version", "commit"],
+      "additionalProperties": false,
+      "properties": {
+        "version": { "type": "string" },
+        "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+      }
+    },
+    "strict": { "type": "boolean", "description": "Whether the rules of 365 Day & Night were applied (--strict)." },
+    "minimumDeltaE2000": { "type": "number", "description": "CIEDE2000 difference under which two colors to tell apart are confused." },
+    "warnings": { "$ref": "#/$defs/warnings", "description": "Warnings about the extensions: their manifest and the colors they contribute." },
+    "themes": { "type": "array", "items": { "$ref": "#/$defs/theme" } },
+    "variety": {
+      "type": "array",
+      "description": "In strict mode, for each extension folder and theme type with two themes or more: how different the themes look.",
+      "items": { "$ref": "#/$defs/variety" }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["themes", "themesWithFailures", "failures", "unreadable"],
+      "additionalProperties": false,
+      "properties": {
+        "themes": { "type": "integer", "minimum": 0 },
+        "themesWithFailures": { "type": "integer", "minimum": 0 },
+        "failures": { "type": "integer", "minimum": 0, "description": "Failed checks, confused pairs and variety failures. The exit code is 1 when it is not 0." },
+        "unreadable": { "type": "integer", "minimum": 0, "description": "Themes that cannot be read. The exit code is 2 when it is not 0." }
+      }
+    }
+  },
+  "$defs": {
+    "warnings": { "type": "array", "items": { "type": "string" } },
+    "color": { "type": "string", "pattern": "^#[0-9A-F]{6}([0-9A-F]{2})?$" },
+    "colors": { "type": "array", "items": { "$ref": "#/$defs/color" }, "minItems": 2, "maxItems": 2 },
+    "uiTheme": { "enum": ["vs", "vs-dark", "hc-black", "hc-light"] },
+    "pair": { "type": "array", "items": { "type": "string" }, "minItems": 2, "maxItems": 2 },
+    "theme": {
+      "type": "object",
+      "required": ["label", "file", "uiTheme", "warnings"],
+      "additionalProperties": false,
+      "properties": {
+        "label": { "type": "string" },
+        "file": { "type": "string", "description": "The theme file, relative to the folder where the command ran." },
+        "uiTheme": { "$ref": "#/$defs/uiTheme" },
+        "warnings": { "$ref": "#/$defs/warnings" },
+        "error": { "type": "string", "description": "Why the theme cannot be read. The other fields are then absent." },
+        "summary": {
+          "type": "object",
+          "required": ["checks", "failed", "missing", "information", "pairs", "confused"],
+          "additionalProperties": false,
+          "properties": {
+            "checks": { "type": "integer", "minimum": 0 },
+            "failed": { "type": "integer", "minimum": 0 },
+            "missing": { "type": "integer", "minimum": 0, "description": "Colors that VS Code does not show, outside strict mode: information." },
+            "information": { "type": "integer", "minimum": 0, "description": "Checks for information that do not pass." },
+            "pairs": { "type": "integer", "minimum": 0 },
+            "confused": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "checks": { "type": "array", "items": { "$ref": "#/$defs/check" } },
+        "distinctions": { "type": "array", "items": { "$ref": "#/$defs/distinction" } },
+        "achromatopsia": {
+          "type": "array",
+          "description": "Syntax colors seen without color: information only.",
+          "items": {
+            "type": "object",
+            "required": ["pair", "deltaE2000", "cie76", "colors"],
+            "additionalProperties": false,
+            "properties": {
+              "pair": { "$ref": "#/$defs/pair" },
+              "deltaE2000": { "type": "number" },
+              "cie76": { "type": "number" },
+              "colors": { "$ref": "#/$defs/colors" }
+            }
+          }
+        }
+      }
+    },
+    "check": {
+      "type": "object",
+      "required": ["label", "value", "minimum", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "label": { "type": "string" },
+        "value": { "type": ["number", "null"], "description": "Contrast ratio or ΔE; null for a style or a missing color." },
+        "minimum": { "type": ["number", "string"], "description": "The minimum value, or the style expected (italic, bold, underline, strikethrough)." },
+        "status": { "enum": ["pass", "fail", "missing"], "description": "missing: a color is not there, a failure only in strict mode." },
+        "information": { "const": true, "description": "Measured for information: never a failure." },
+        "colors": { "$ref": "#/$defs/colors", "description": "The two colors measured, as shown: opaque, after composition." }
+      }
+    },
+    "distinction": {
+      "type": "object",
+      "required": ["view", "pair", "deltaE2000", "model", "cie76", "colors", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "view": { "enum": ["normal", "protan", "deutan", "tritan"] },
+        "pair": { "$ref": "#/$defs/pair" },
+        "deltaE2000": { "type": "number", "description": "The smallest CIEDE2000 difference among the models of this vision." },
+        "model": { "type": ["string", "null"], "description": "The simulation model that gives it; null in normal vision." },
+        "cie76": { "type": "number" },
+        "colors": { "$ref": "#/$defs/colors" },
+        "status": { "enum": ["pass", "fail"] }
+      }
+    },
+    "pairDistance": {
+      "type": "object",
+      "required": ["themes", "deltaE"],
+      "additionalProperties": false,
+      "properties": {
+        "themes": { "$ref": "#/$defs/pair" },
+        "deltaE": { "type": "number" }
+      }
+    },
+    "variety": {
+      "type": "object",
+      "required": ["folder", "uiTheme", "themes", "measures", "families", "maxPerFamily", "missing", "failures"],
+      "additionalProperties": false,
+      "properties": {
+        "folder": { "type": "string" },
+        "uiTheme": { "$ref": "#/$defs/uiTheme" },
+        "themes": { "type": "array", "items": { "type": "string" } },
+        "measures": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["measure", "threshold", "pairs", "meanDeltaE2000", "colorBlindness"],
+            "additionalProperties": false,
+            "properties": {
+              "measure": { "type": "string", "description": "A workbench color, or syntax for the mean of 6 syntax colors." },
+              "threshold": { "type": ["number", "null"], "description": "CIE76 threshold; null for information." },
+              "pairs": { "type": "array", "items": { "$ref": "#/$defs/pairDistance" } },
+              "meanDeltaE2000": { "type": "number" },
+              "colorBlindness": {
+                "type": ["object", "null"],
+                "additionalProperties": false,
+                "properties": {
+                  "protan": { "type": "array", "items": { "$ref": "#/$defs/pairDistance" } },
+                  "deutan": { "type": "array", "items": { "$ref": "#/$defs/pairDistance" } },
+                  "tritan": { "type": "array", "items": { "$ref": "#/$defs/pairDistance" } }
+                }
+              }
+            }
+          }
+        },
+        "families": {
+          "type": "object",
+          "additionalProperties": { "type": "object", "additionalProperties": { "type": "string" } }
+        },
+        "maxPerFamily": { "type": "integer" },
+        "missing": { "type": "array", "items": { "type": "string" } },
+        "failures": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}
