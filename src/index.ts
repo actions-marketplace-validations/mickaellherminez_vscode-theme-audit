@@ -10,3 +10,7 @@ export { ACHROMATOPSIA, BRETTEL, MACHADO, MODELS, SIMULATIONS, VIENOT, VIEWS, pr
 export type { Deficiency, HalfPlanes, Matrix, Simulation, View } from './simulation.ts';
 export { INVALID_COLOR, ThemeError, UI_THEMES, extensionThemes, loadTheme, readJsonc } from './theme.ts';
 export type { SemanticRule, TextMateRule, Theme, ThemeContribution, ThemeWarning, TokenSettings, UiTheme } from './theme.ts';
+export { FontStyle, TextMateTheme, parseRules } from './textmate.ts';
+export type { ParsedRule, RawRule, StyleAttributes } from './textmate.ts';
+export { EDITOR_DEFAULTS, THEME_TYPES, TokenColors, normalizeColor, textMateRules } from './tokens.ts';
+export type { ThemeType, TokenStyle } from './tokens.ts';
