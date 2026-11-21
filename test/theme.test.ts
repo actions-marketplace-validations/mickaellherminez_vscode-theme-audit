@@ -121,6 +121,28 @@ describe('colors that VS Code cannot read', () => {
   });
 });
 
+describe('semantic token styles that VS Code cannot read', () => {
+  test('a color that is not hexadecimal, or a value that is not a style, gives a warning', () => {
+    const dir = folder({ 'theme.json': { semanticTokenColors: { variable: 'blue', parameter: { foreground: '#12' }, property: { background: '#000000' }, label: true } } });
+    const theme = loadTheme(join(dir, 'theme.json'));
+    assert.deepEqual(theme.warnings.map((w) => w.message), [
+      `"semanticTokenColors: variable" is not a hexadecimal color ("blue"): VS Code shows ${INVALID_COLOR}`,
+      `"semanticTokenColors: parameter" is not a hexadecimal color ("#12"): VS Code shows ${INVALID_COLOR}`,
+      '"semanticTokenColors: property" is neither a color nor a style: VS Code ignores it',
+      '"semanticTokenColors: label" is neither a color nor a style: VS Code ignores it',
+    ]);
+    assert.equal(theme.semanticTokenColors.length, 4);
+  });
+
+  test('a style whose foreground is not a string makes VS Code refuse the theme', () => {
+    const dir = folder({ 'theme.json': { semanticTokenColors: { variable: { foreground: null, bold: true } } } });
+    assert.throws(() => loadTheme(join(dir, 'theme.json')), (error: unknown) => error instanceof ThemeError && /refuses this theme/.test(error.message));
+    // Without a valid style property, VS Code ignores the value instead
+    const ignored = folder({ 'theme.json': { semanticTokenColors: { variable: { foreground: 12 } } } });
+    assert.equal(loadTheme(join(ignored, 'theme.json')).warnings.length, 1);
+  });
+});
+
 describe('the old format: TextMate rules in "settings"', () => {
   test('a rule without scope sets workbench colors, and keeps only its foreground, background and font style', () => {
     const dir = folder({

@@ -66,7 +66,7 @@ export function normalizeColor(value: unknown): string | undefined {
 }
 
 /** A workbench color as VS Code writes it back (Color, then formatHexA with compact): '#RRGGBB', or '#RRGGBBAA'. */
-function workbenchColor(value: string): string {
+export function workbenchColor(value: string): string {
   const { rgb, alpha } = parse(value);
   const a = Math.round(alpha * 255);
   return a === 255 ? toHex(rgb) : toHex(rgb) + a.toString(16).padStart(2, '0').toUpperCase();
