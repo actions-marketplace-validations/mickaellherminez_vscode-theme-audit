@@ -19,6 +19,18 @@ node src/cli.ts --help   # run the command from the sources
 python3 -I test/data/colorlib_reference.py ../365-daynight-vscode-theme-ext > test/data/colorlib-reference.json
 ```
 
+## Reading a theme
+
+`src/theme.ts` follows how VS Code loads a color theme: `_loadColorTheme` in [`colorThemeData.ts`](https://github.com/microsoft/vscode/blob/main/src/vs/workbench/services/themes/common/colorThemeData.ts) and `convertSettings` in [`themeCompatibility.ts`](https://github.com/microsoft/vscode/blob/main/src/vs/workbench/services/themes/common/themeCompatibility.ts), as of commit `671d82d2d8` of microsoft/vscode (November 21, 2026). When VS Code changes them, update the code, its comments and `test/theme.test.ts`.
+
+What VS Code does, and the package with it:
+
+- JSON with comments and trailing commas is accepted; any other syntax error refuses the theme.
+- An `include` is read first. The theme then replaces its colors and adds its TextMate rules after the included ones. `"default"` removes an included color.
+- A color without `#`, or with a length other than 3, 4, 6 or 8 digits, is shown in red (`#FF0000`); an empty string too. A character that is not a hexadecimal digit counts as 0. A value that is not a string is ignored. The package gives a warning for each case.
+- A file with a `settings` array uses the old format: its rules without scope set some workbench colors, and the rest of the file is ignored.
+- In an extension, a theme without `uiTheme` is dark (`vs-dark`), and a theme without `label` takes its file name.
+
 ## Checks
 
 | Command | What it does |

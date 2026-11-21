@@ -8,3 +8,5 @@ export { ciede2000, deltaE, deltaE2000, lab } from './difference.ts';
 export type { Lab } from './difference.ts';
 export { ACHROMATOPSIA, BRETTEL, MACHADO, MODELS, SIMULATIONS, VIENOT, VIEWS, project, simulate } from './simulation.ts';
 export type { Deficiency, HalfPlanes, Matrix, Simulation, View } from './simulation.ts';
+export { INVALID_COLOR, ThemeError, UI_THEMES, extensionThemes, loadTheme, readJsonc } from './theme.ts';
+export type { SemanticRule, TextMateRule, Theme, ThemeContribution, ThemeWarning, TokenSettings, UiTheme } from './theme.ts';
