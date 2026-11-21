@@ -27,6 +27,8 @@ export interface Check {
   status: CheckStatus;
   /** Measured for information: never a failure. */
   information?: true;
+  /** The two colors measured, as shown: opaque, after composition on what is under them ('#RRGGBB'). */
+  colors?: [string, string];
 }
 
 /** Two colors that must stay distinct, and their closest simulation for one vision. */
@@ -39,6 +41,8 @@ export interface Distinction {
   model: string | null;
   /** CIE76 difference with the same model, for information. */
   cie76: number;
+  /** The two colors, as the theme or VS Code gives them. */
+  colors: [string, string];
   status: 'pass' | 'fail';
 }
 
@@ -260,7 +264,7 @@ export function auditTheme(theme: Theme, uiTheme: UiTheme, options: AuditOptions
     checks: checks(theme, uiTheme, strict, registry, tokens),
     distinctions: distinctions(theme, uiTheme, strict, registry, tokens),
     achromatopsia: closest(distinctTokens(tokens), combinations(DISTINCT_TOKENS.filter((t) => tokens.has(t))), { '': ACHROMATOPSIA })
-      .map(({ pair, deltaE2000, cie76 }) => ({ pair, deltaE2000, cie76 })),
+      .map(({ pair, deltaE2000, cie76, colors }) => ({ pair, deltaE2000, cie76, colors })),
   };
 }
 
@@ -285,7 +289,7 @@ function checks(theme: Theme, uiTheme: UiTheme, strict: boolean, registry: Color
     const opaqueBack = back.length === 7 ? back : over(back, bg);
     const opaqueFg = fg.length === 7 ? fg : over(fg, opaqueBack);
     const ratio = contrast(opaqueFg, opaqueBack);
-    rows.push({ label, value: ratio, minimum, status: ratio >= minimum ? 'pass' : 'fail' });
+    rows.push({ label, value: ratio, minimum, status: ratio >= minimum ? 'pass' : 'fail', colors: [opaqueFg.toUpperCase(), opaqueBack.toUpperCase()] });
   };
   const onBg = (color: string | undefined) => color === undefined ? undefined : over(color, bg);
 
@@ -429,7 +433,10 @@ function checks(theme: Theme, uiTheme: UiTheme, strict: boolean, registry: Color
     const barText = g('statusBar.foreground');
     if (button !== undefined && barText !== undefined) {
       const distance = deltaE(button, barText);
-      rows.push({ label: 'Status bar button distinct from the status bar text', value: distance, minimum: MIN_BUTTON_DELTA_E, status: distance >= MIN_BUTTON_DELTA_E ? 'pass' : 'fail' });
+      rows.push({
+        label: 'Status bar button distinct from the status bar text', value: distance, minimum: MIN_BUTTON_DELTA_E,
+        status: distance >= MIN_BUTTON_DELTA_E ? 'pass' : 'fail', colors: [button.toUpperCase(), barText.toUpperCase()],
+      });
     }
     // Recent surfaces: keys whose defaults in VS Code ignore the theme must be set
     for (const key of PRIORITY_KEYS) {
@@ -556,7 +563,7 @@ function distinctTokens(tokens: Map<string, string>): Map<string, string | undef
 
 /** For each pair, the model that brings its two colors the closest (the first one on a tie), from closest to farthest. */
 function closest(colors: Map<string, string | undefined>, pairs: readonly [string, string][], models: Readonly<Record<string, Simulation | null>>) {
-  const result: { pair: [string, string]; deltaE2000: number; model: string | null; cie76: number }[] = [];
+  const result: { pair: [string, string]; deltaE2000: number; model: string | null; cie76: number; colors: [string, string] }[] = [];
   for (const [a, b] of pairs) {
     const ca = colors.get(a);
     const cb = colors.get(b);
@@ -566,7 +573,7 @@ function closest(colors: Map<string, string | undefined>, pairs: readonly [strin
       const delta = deltaE2000(ca, cb, simulation);
       if (best === undefined || delta < best.delta) best = { model, simulation, delta };
     }
-    if (best) result.push({ pair: [a, b], deltaE2000: best.delta, model: best.model || null, cie76: deltaE(ca, cb, best.simulation) });
+    if (best) result.push({ pair: [a, b], deltaE2000: best.delta, model: best.model || null, cie76: deltaE(ca, cb, best.simulation), colors: [ca.toUpperCase(), cb.toUpperCase()] });
   }
   return result.sort((x, y) => x.deltaE2000 - y.deltaE2000);
 }

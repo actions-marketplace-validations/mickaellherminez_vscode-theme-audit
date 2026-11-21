@@ -122,6 +122,12 @@ python3 -I test/data/audit_reference.py ../365-daynight-vscode-theme-ext test/da
 
 The script gives the labels in English, as the package writes them, and stops on a label it cannot translate: after a change of `audit.py`, add the translation, port the change to `src/audit.ts`, then run `npm test`. To go back to the previous results, check out `test/data/365/` and `test/data/audit-reference.json` from git.
 
+## The command
+
+`src/main.ts` reads the options, `src/report.ts` audits the paths and writes the report. `auditPaths()` gives the report as an object, in the JSON format; `textReport()` writes it for people, and `exitCode()` gives the exit code.
+
+The JSON format is described by [`schema/report-v1.schema.json`](schema/report-v1.schema.json) (JSON Schema 2020-12), published with the package. The schema refuses unknown fields, so a field added to the report must be added to the schema in the same pull request. Format 1 can gain fields; removing a field or changing its meaning means format 2: a new schema file, `REPORT_FORMAT` in `src/report.ts`, and a line in the CHANGELOG. `test/cli.test.ts` checks every option and exit code, and validates each JSON report against the schema with [Ajv](https://ajv.js.org/), a development dependency.
+
 ## Checks
 
 | Command | What it does |
