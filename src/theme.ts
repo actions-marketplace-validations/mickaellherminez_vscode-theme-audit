@@ -2,8 +2,8 @@
 // _loadColorTheme, and themeCompatibility.ts, convertSettings; checked on microsoft/vscode 1.147.0).
 // Copyright (c) Microsoft Corporation for the rules of VS Code. Licensed under the MIT License: see THIRD-PARTY-NOTICES.md.
 
-import { readFileSync } from 'node:fs';
-import { dirname, extname, resolve } from 'node:path';
+import { readFileSync, readdirSync } from 'node:fs';
+import { dirname, extname, join, parse, resolve, sep } from 'node:path';
 
 import { parse as parseJsonc, printParseErrorCode } from 'jsonc-parser';
 import type { ParseError } from 'jsonc-parser';
@@ -185,7 +185,39 @@ function checkSemanticStyle(selector: string, style: unknown, file: string, warn
   }
 }
 
-function load(file: string, theme: Theme, chain: readonly string[]): void {
+/**
+ * The path of a file as its names are written on disk, and the names that differ only by case. VS Code finds such a
+ * file on macOS and Windows, where file names usually ignore case, but not on Linux: the package reads it on every
+ * system, so that the audit gives the same result everywhere, with a warning.
+ */
+function onDisk(file: string): { path: string; renamed: string[] } {
+  const { root } = parse(file);
+  let path = root;
+  const renamed: string[] = [];
+  for (const name of file.slice(root.length).split(sep).filter(Boolean)) {
+    let names: string[];
+    try {
+      names = readdirSync(path);
+    } catch {
+      return { path: file, renamed: [] };
+    }
+    let actual = name;
+    if (!names.includes(name)) {
+      const matches = names.filter((n) => n.toLowerCase() === name.toLowerCase());
+      if (matches.length !== 1 || matches[0] === undefined) return { path: file, renamed: [] };
+      actual = matches[0];
+      renamed.push(`"${name}" is named "${actual}"`);
+    }
+    path = join(path, actual);
+  }
+  return { path, renamed };
+}
+
+function load(requested: string, theme: Theme, chain: readonly string[]): void {
+  const { path: file, renamed } = onDisk(requested);
+  if (renamed.length > 0) {
+    theme.warnings.push({ file: requested, message: `${renamed.join(', ')} on disk: VS Code finds this file on macOS and Windows, but not on Linux, where file names do not ignore case` });
+  }
   if (chain.includes(file)) throw new ThemeError(file, `includes itself (${[...chain, file].join(' -> ')})`);
   if (extname(file) !== '.json') {
     throw new ThemeError(file, 'TextMate theme files (.tmTheme) are not supported yet');

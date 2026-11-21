@@ -8,10 +8,9 @@ import { join } from 'node:path';
 import { after, describe, test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { Ajv2020 } from 'ajv/dist/2020.js';
-
 import { HELP, main, packageVersion } from '../src/main.ts';
 import type { Report } from '../src/report.ts';
+import { schemaErrors, validateReport } from './report-schema.ts';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const DATA = join(ROOT, 'test', 'data');
@@ -23,15 +22,12 @@ function run(args: string[], cwd = ROOT) {
   return { code, out, err };
 }
 
-const schema = JSON.parse(readFileSync(join(ROOT, 'schema', 'report-v1.schema.json'), 'utf8')) as object;
-const validate = new Ajv2020({ allErrors: true, strict: true, allowUnionTypes: true }).compile(schema);
-
 /** The JSON report, checked against its schema. */
 function json(args: string[], cwd = ROOT): { code: number; report: Report } {
   const { code, out, err } = run([...args, '--json'], cwd);
   assert.equal(err, '');
   const report = JSON.parse(out) as Report;
-  assert.ok(validate(report), JSON.stringify(validate.errors?.slice(0, 3)));
+  assert.ok(validateReport(report), schemaErrors());
   return { code, report };
 }
 

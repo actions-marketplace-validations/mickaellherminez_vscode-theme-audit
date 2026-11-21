@@ -1,0 +1,1294 @@
+[
+  {
+    "id": "zhuangtongfa.material-theme",
+    "version": "3.20.7",
+    "warnings": [],
+    "themes": [
+      {
+        "label": "One Dark Pro",
+        "uiTheme": "vs-dark",
+        "file": "themes/OneDark-Pro.json",
+        "warnings": []
+      },
+      {
+        "label": "One Dark Pro Flat",
+        "uiTheme": "vs-dark",
+        "file": "themes/OneDark-Pro-flat.json",
+        "warnings": []
+      },
+      {
+        "label": "One Dark Pro Darker",
+        "uiTheme": "vs-dark",
+        "file": "themes/OneDark-Pro-darker.json",
+        "warnings": []
+      },
+      {
+        "label": "One Dark Pro Mix",
+        "uiTheme": "vs-dark",
+        "file": "themes/OneDark-Pro-mix.json",
+        "warnings": []
+      },
+      {
+        "label": "One Dark Pro Night Flat",
+        "uiTheme": "vs-dark",
+        "file": "themes/OneDark-Pro-night-flat.json",
+        "warnings": []
+      }
+    ]
+  },
+  {
+    "id": "Catppuccin.catppuccin-vsc",
+    "version": "3.19.0",
+    "warnings": [],
+    "themes": [
+      {
+        "label": "Catppuccin Mocha",
+        "uiTheme": "vs-dark",
+        "file": "themes/mocha.json",
+        "warnings": []
+      },
+      {
+        "label": "Catppuccin Macchiato",
+        "uiTheme": "vs-dark",
+        "file": "themes/macchiato.json",
+        "warnings": []
+      },
+      {
+        "label": "Catppuccin Frappé",
+        "uiTheme": "vs-dark",
+        "file": "themes/frappe.json",
+        "warnings": []
+      },
+      {
+        "label": "Catppuccin Latte",
+        "uiTheme": "vs",
+        "file": "themes/latte.json",
+        "warnings": []
+      }
+    ]
+  },
+  {
+    "id": "ms-vscode.cpptools-themes",
+    "version": "2.0.0",
+    "warnings": [],
+    "themes": [
+      {
+        "label": "Dark (Visual Studio - C/C++)",
+        "uiTheme": "vs-dark",
+        "file": "themes/cpptools_dark_vs_new.json",
+        "warnings": []
+      },
+      {
+        "label": "2017 Dark (Visual Studio - C/C++)",
+        "uiTheme": "vs-dark",
+        "file": "themes/cpptools_dark_vs.json",
+        "warnings": []
+      },
+      {
+        "label": "Light (Visual Studio - C/C++)",
+        "uiTheme": "vs",
+        "file": "themes/cpptools_light_vs_new.json",
+        "warnings": []
+      },
+      {
+        "label": "2017 Light (Visual Studio - C/C++)",
+        "uiTheme": "vs",
+        "file": "themes/cpptools_light_vs.json",
+        "warnings": []
+      }
+    ]
+  },
+  {
+    "id": "dracula-theme.theme-dracula",
+    "version": "2.25.1",
+    "warnings": [],
+    "themes": [
+      {
+        "label": "Dracula Theme",
+        "uiTheme": "vs-dark",
+        "file": "theme/dracula.json",
+        "warnings": []
+      },
+      {
+        "label": "Dracula Theme Soft",
+        "uiTheme": "vs-dark",
+        "file": "theme/dracula-soft.json",
+        "warnings": []
+      }
+    ]
+  },
+  {
+    "id": "gitpod.gitpod-theme",
+    "version": "0.0.2",
+    "warnings": [],
+    "themes": [
+      {
+        "label": "Gitpod Dark",
+        "uiTheme": "vs-dark",
+        "file": "themes/gitpod-dark-color-theme.json",
+        "warnings": []
+      },
+      {
+        "label": "Gitpod Light",
+        "uiTheme": "vs",
+        "file": "themes/gitpod-light-color-theme.json",
+        "warnings": []
+      }
+    ]
+  },
+  {
+    "id": "GitHub.github-vscode-theme",
+    "version": "6.3.5",
+    "warnings": [],
+    "themes": [
+      {
+        "label": "GitHub Light Default",
+        "uiTheme": "vs",
+        "file": "themes/light-default.json",
+        "warnings": []
+      },
+      {
+        "label": "GitHub Light High Contrast",
+        "uiTheme": "hc-light",
+        "file": "themes/light-high-contrast.json",
+        "warnings": []
+      },
+      {
+        "label": "GitHub Light Colorblind (Beta)",
+        "uiTheme": "vs",
+        "file": "themes/light-colorblind.json",
+        "warnings": []
+      },
+      {
+        "label": "GitHub Dark Default",
+        "uiTheme": "vs-dark",
+        "file": "themes/dark-default.json",
+        "warnings": [
+          "themes/dark-default.json: \"symbolIcon.constantForeground\" is an array, not a color: VS Code ignores it"
+        ]
+      },
+      {
+        "label": "GitHub Dark High Contrast",
+        "uiTheme": "hc-black",
+        "file": "themes/dark-high-contrast.json",
+        "warnings": [
+          "themes/dark-high-contrast.json: \"symbolIcon.constantForeground\" is an array, not a color: VS Code ignores it"
+        ]
+      },
+      {
+        "label": "GitHub Dark Colorblind (Beta)",
+        "uiTheme": "vs-dark",
+        "file": "themes/dark-colorblind.json",
+        "warnings": [
+          "themes/dark-colorblind.json: \"symbolIcon.constantForeground\" is an array, not a color: VS Code ignores it"
+        ]
+      },
+      {
+        "label": "GitHub Dark Dimmed",
+        "uiTheme": "vs-dark",
+        "file": "themes/dark-dimmed.json",
+        "warnings": [
+          "themes/dark-dimmed.json: \"symbolIcon.constantForeground\" is an array, not a color: VS Code ignores it"
+        ]
+      },
+      {
+        "label": "GitHub Light",
+        "uiTheme": "vs",
+        "file": "themes/light.json",
+        "warnings": []
+      },
+      {
+        "label": "GitHub Dark",
+        "uiTheme": "vs-dark",
+        "file": "themes/dark.json",
+        "warnings": []
+      }
+    ]
+  },
+  {
+    "id": "monokai.theme-monokai-pro-vscode",
+    "version": "2.0.17",
+    "warnings": [],
+    "themes": [
+      {
+        "label": "Monokai Pro",
+        "uiTheme": "vs-dark",
+        "file": "themes/Monokai Pro.json",
+        "warnings": [
+          "themes/Monokai Pro.json: \"diffEditor.move.border\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Pro.json: \"diffEditor.moveActive.border\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Pro.json: \"simpleFindWidget.sashBorder\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Pro.json: \"statusBarItem.offlineBackground\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Pro.json: \"statusBarItem.offlineForeground\" is not a hexadecimal color (\"\"): VS Code shows #FF0000"
+        ]
+      },
+      {
+        "label": "Monokai Pro (Filter Octagon)",
+        "uiTheme": "vs-dark",
+        "file": "themes/Monokai Pro (Filter Octagon).json",
+        "warnings": [
+          "themes/Monokai Pro (Filter Octagon).json: \"diffEditor.move.border\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Pro (Filter Octagon).json: \"diffEditor.moveActive.border\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Pro (Filter Octagon).json: \"simpleFindWidget.sashBorder\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Pro (Filter Octagon).json: \"statusBarItem.offlineBackground\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Pro (Filter Octagon).json: \"statusBarItem.offlineForeground\" is not a hexadecimal color (\"\"): VS Code shows #FF0000"
+        ]
+      },
+      {
+        "label": "Monokai Pro (Filter Ristretto)",
+        "uiTheme": "vs-dark",
+        "file": "themes/Monokai Pro (Filter Ristretto).json",
+        "warnings": [
+          "themes/Monokai Pro (Filter Ristretto).json: \"diffEditor.move.border\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Pro (Filter Ristretto).json: \"diffEditor.moveActive.border\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Pro (Filter Ristretto).json: \"simpleFindWidget.sashBorder\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Pro (Filter Ristretto).json: \"statusBarItem.offlineBackground\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Pro (Filter Ristretto).json: \"statusBarItem.offlineForeground\" is not a hexadecimal color (\"\"): VS Code shows #FF0000"
+        ]
+      },
+      {
+        "label": "Monokai Pro (Filter Spectrum)",
+        "uiTheme": "vs-dark",
+        "file": "themes/Monokai Pro (Filter Spectrum).json",
+        "warnings": [
+          "themes/Monokai Pro (Filter Spectrum).json: \"diffEditor.move.border\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Pro (Filter Spectrum).json: \"diffEditor.moveActive.border\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Pro (Filter Spectrum).json: \"simpleFindWidget.sashBorder\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Pro (Filter Spectrum).json: \"statusBarItem.offlineBackground\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Pro (Filter Spectrum).json: \"statusBarItem.offlineForeground\" is not a hexadecimal color (\"\"): VS Code shows #FF0000"
+        ]
+      },
+      {
+        "label": "Monokai Pro (Filter Machine)",
+        "uiTheme": "vs-dark",
+        "file": "themes/Monokai Pro (Filter Machine).json",
+        "warnings": [
+          "themes/Monokai Pro (Filter Machine).json: \"diffEditor.move.border\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Pro (Filter Machine).json: \"diffEditor.moveActive.border\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Pro (Filter Machine).json: \"simpleFindWidget.sashBorder\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Pro (Filter Machine).json: \"statusBarItem.offlineBackground\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Pro (Filter Machine).json: \"statusBarItem.offlineForeground\" is not a hexadecimal color (\"\"): VS Code shows #FF0000"
+        ]
+      },
+      {
+        "label": "Monokai Pro Light",
+        "uiTheme": "vs",
+        "file": "themes/Monokai Pro Light.json",
+        "warnings": [
+          "themes/Monokai Pro Light.json: \"diffEditor.move.border\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Pro Light.json: \"diffEditor.moveActive.border\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Pro Light.json: \"simpleFindWidget.sashBorder\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Pro Light.json: \"statusBarItem.offlineBackground\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Pro Light.json: \"statusBarItem.offlineForeground\" is not a hexadecimal color (\"\"): VS Code shows #FF0000"
+        ]
+      },
+      {
+        "label": "Monokai Pro Light (Filter Sun)",
+        "uiTheme": "vs",
+        "file": "themes/Monokai Pro Light (Filter Sun).json",
+        "warnings": [
+          "themes/Monokai Pro Light (Filter Sun).json: \"diffEditor.move.border\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Pro Light (Filter Sun).json: \"diffEditor.moveActive.border\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Pro Light (Filter Sun).json: \"simpleFindWidget.sashBorder\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Pro Light (Filter Sun).json: \"statusBarItem.offlineBackground\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Pro Light (Filter Sun).json: \"statusBarItem.offlineForeground\" is not a hexadecimal color (\"\"): VS Code shows #FF0000"
+        ]
+      },
+      {
+        "label": "Monokai Classic",
+        "uiTheme": "vs-dark",
+        "file": "themes/Monokai Classic.json",
+        "warnings": [
+          "themes/Monokai Classic.json: \"diffEditor.move.border\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Classic.json: \"diffEditor.moveActive.border\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Classic.json: \"simpleFindWidget.sashBorder\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Classic.json: \"statusBarItem.offlineBackground\" is not a hexadecimal color (\"\"): VS Code shows #FF0000",
+          "themes/Monokai Classic.json: \"statusBarItem.offlineForeground\" is not a hexadecimal color (\"\"): VS Code shows #FF0000"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "teabyii.ayu",
+    "version": "1.6.0",
+    "warnings": [],
+    "themes": [
+      {
+        "label": "Ayu Light",
+        "uiTheme": "vs",
+        "file": "ayu-light.json",
+        "warnings": []
+      },
+      {
+        "label": "Ayu Mirage",
+        "uiTheme": "vs-dark",
+        "file": "ayu-mirage.json",
+        "warnings": []
+      },
+      {
+        "label": "Ayu Dark",
+        "uiTheme": "vs-dark",
+        "file": "ayu-dark.json",
+        "warnings": []
+      },
+      {
+        "label": "Ayu Light Unbordered",
+        "uiTheme": "vs",
+        "file": "ayu-light-unbordered.json",
+        "warnings": []
+      },
+      {
+        "label": "Ayu Mirage Unbordered",
+        "uiTheme": "vs-dark",
+        "file": "ayu-mirage-unbordered.json",
+        "warnings": []
+      },
+      {
+        "label": "Ayu Dark Unbordered",
+        "uiTheme": "vs-dark",
+        "file": "ayu-dark-unbordered.json",
+        "warnings": []
+      }
+    ]
+  },
+  {
+    "id": "jdinhlife.gruvbox",
+    "version": "1.29.2",
+    "warnings": [],
+    "themes": [
+      {
+        "label": "Gruvbox Dark Medium",
+        "uiTheme": "vs-dark",
+        "file": "themes/gruvbox-dark-medium.json",
+        "warnings": []
+      },
+      {
+        "label": "Gruvbox Dark Hard",
+        "uiTheme": "vs-dark",
+        "file": "themes/gruvbox-dark-hard.json",
+        "warnings": []
+      },
+      {
+        "label": "Gruvbox Dark Soft",
+        "uiTheme": "vs-dark",
+        "file": "themes/gruvbox-dark-soft.json",
+        "warnings": []
+      },
+      {
+        "label": "Gruvbox Light Medium",
+        "uiTheme": "vs",
+        "file": "themes/gruvbox-light-medium.json",
+        "warnings": []
+      },
+      {
+        "label": "Gruvbox Light Hard",
+        "uiTheme": "vs",
+        "file": "themes/gruvbox-light-hard.json",
+        "warnings": []
+      },
+      {
+        "label": "Gruvbox Light Soft",
+        "uiTheme": "vs",
+        "file": "themes/gruvbox-light-soft.json",
+        "warnings": []
+      }
+    ]
+  },
+  {
+    "id": "akamud.vscode-theme-onedark",
+    "version": "2.3.0",
+    "warnings": [],
+    "themes": [
+      {
+        "label": "Atom One Dark",
+        "uiTheme": "vs-dark",
+        "file": "themes/OneDark.json",
+        "warnings": []
+      }
+    ]
+  },
+  {
+    "id": "fisheva.eva-theme",
+    "version": "2.9.1",
+    "warnings": [],
+    "themes": [
+      {
+        "label": "Eva Dark",
+        "uiTheme": "vs-dark",
+        "file": "themes/Eva-Dark.json",
+        "warnings": []
+      },
+      {
+        "label": "Eva Dark Bold",
+        "uiTheme": "vs-dark",
+        "file": "themes/Eva-Dark-Bold.json",
+        "warnings": []
+      },
+      {
+        "label": "Eva Dark Italic",
+        "uiTheme": "vs-dark",
+        "file": "themes/Eva-Dark-Italic.json",
+        "warnings": []
+      },
+      {
+        "label": "Eva Dark Italic Bold",
+        "uiTheme": "vs-dark",
+        "file": "themes/Eva-Dark-Italic-Bold.json",
+        "warnings": []
+      },
+      {
+        "label": "Eva Light",
+        "uiTheme": "vs",
+        "file": "themes/Eva-Light.json",
+        "warnings": []
+      },
+      {
+        "label": "Eva Light Bold",
+        "uiTheme": "vs",
+        "file": "themes/Eva-Light-Bold.json",
+        "warnings": []
+      },
+      {
+        "label": "Eva Light Italic",
+        "uiTheme": "vs",
+        "file": "themes/Eva-Light-Italic.json",
+        "warnings": []
+      },
+      {
+        "label": "Eva Light Italic Bold",
+        "uiTheme": "vs",
+        "file": "themes/Eva-Light-Italic-Bold.json",
+        "warnings": []
+      }
+    ]
+  },
+  {
+    "id": "enkia.tokyo-night",
+    "version": "1.1.2",
+    "warnings": [],
+    "themes": [
+      {
+        "label": "Tokyo Night",
+        "uiTheme": "vs-dark",
+        "file": "themes/tokyo-night-color-theme.json",
+        "warnings": []
+      },
+      {
+        "label": "Tokyo Night Storm",
+        "uiTheme": "vs-dark",
+        "file": "themes/tokyo-night-storm-color-theme.json",
+        "warnings": []
+      },
+      {
+        "label": "Tokyo Night Light",
+        "uiTheme": "vs",
+        "file": "themes/tokyo-night-light-color-theme.json",
+        "warnings": []
+      }
+    ]
+  },
+  {
+    "id": "BeardedBear.beardedtheme",
+    "version": "10.1.0",
+    "warnings": [],
+    "themes": [
+      {
+        "label": "Bearded Theme Monokai Metallian",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-monokai-metallian.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Monokai Terra",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-monokai-terra.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Monokai Stone",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-monokai-stone.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Monokai Black",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-monokai-black.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Monokai Reversed",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-monokai-reversed.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Solarized",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-solarized-dark.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Solarized Reversed",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-solarized-reversed.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Solarized Light",
+        "uiTheme": "vs",
+        "file": "themes/bearded-theme-solarized-light.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Oceanic",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-oceanic.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Oceanic Reversed",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-oceanic-reversed.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Arc",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-arc.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Arc Eggplant",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-arc-eggplant.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Arc EolStorm",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-arc-eolstorm.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Arc Blueberry",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-arc-blueberry.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Arc Reversed",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-arc-reversed.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Black & Amethyst",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-black-&-amethyst.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Black & Amethyst Soft",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-black-&-amethyst-soft.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Black & Diamond",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-black-&-diamond.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Black & Diamond Soft",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-black-&-diamond-soft.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Black & Emerald",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-black-&-emerald.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Black & Emerald Soft",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-black-&-emerald-soft.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Black & Gold",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-black-&-gold.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Black & Gold Soft",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-black-&-gold-soft.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Black & Ruby",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-black-&-ruby.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Black & Ruby Soft",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-black-&-ruby-soft.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Stained Purple",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-stained-purple.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Stained Blue",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-stained-blue.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Vivid Purple",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-vivid-purple.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Vivid Black",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-vivid-black.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Vivid Light",
+        "uiTheme": "vs",
+        "file": "themes/bearded-theme-vivid-light.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme feat. Will",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-feat-will.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme feat. Gold D Raynh",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-feat-gold-d-raynh.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme feat. Melle Julie",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-feat-mellejulie.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme feat. Melle Julie Light",
+        "uiTheme": "vs",
+        "file": "themes/bearded-theme-feat-mellejulie-light.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme feat. Mintshake D Raynh",
+        "uiTheme": "vs",
+        "file": "themes/bearded-theme-feat-gold-d-raynh-light.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme feat. WebDevCody",
+        "uiTheme": "hc-black",
+        "file": "themes/bearded-theme-feat-webDevCody.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Earth",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-earth.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Coffee",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-coffee.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Coffee Reversed",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-coffee-reversed.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Coffee Cream",
+        "uiTheme": "vs",
+        "file": "themes/bearded-theme-coffee-cream.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Void",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-void.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Altica",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-altica.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Anthracite",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-classics-anthracite.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Light",
+        "uiTheme": "vs",
+        "file": "themes/bearded-theme-classics-light.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Surprising Eggplant",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-surprising-eggplant.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Surprising Blueberry",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-surprising-blueberry.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Surprising Watermelon",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-surprising-watermelon.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme HC Ebony",
+        "uiTheme": "hc-black",
+        "file": "themes/bearded-theme-hc-ebony.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme HC Midnight Void",
+        "uiTheme": "hc-black",
+        "file": "themes/bearded-theme-hc-midnightvoid.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme HC Wonderland Wood",
+        "uiTheme": "hc-black",
+        "file": "themes/bearded-theme-hc-wonderland-wood.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme HC Brewing Storm",
+        "uiTheme": "hc-black",
+        "file": "themes/bearded-theme-hc-brewing-storm.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme HC Minuit",
+        "uiTheme": "hc-black",
+        "file": "themes/bearded-theme-hc-minuit.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme HC Chocolate Espresso",
+        "uiTheme": "hc-black",
+        "file": "themes/bearded-theme-hc-chocolate-espresso.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme HC Flurry",
+        "uiTheme": "hc-black",
+        "file": "themes/bearded-theme-hc-flurry.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Milkshake Raspberry",
+        "uiTheme": "hc-black",
+        "file": "themes/bearded-theme-milkshake-raspberry.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Milkshake Blueberry",
+        "uiTheme": "hc-black",
+        "file": "themes/bearded-theme-milkshake-blueberry.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Milkshake Mango",
+        "uiTheme": "hc-black",
+        "file": "themes/bearded-theme-milkshake-mango.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Milkshake Mint",
+        "uiTheme": "hc-black",
+        "file": "themes/bearded-theme-milkshake-mint.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Milkshake Vanilla Banana",
+        "uiTheme": "hc-black",
+        "file": "themes/bearded-theme-milkshake-vanilla.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Themanopia (Experimental)",
+        "uiTheme": "hc-black",
+        "file": "themes/bearded-theme-themanopia.json",
+        "warnings": [
+          "themes/bearded-theme-themanopia.json: \"bearded-theme-themanopia.json\" is named \"bearded-theme-Themanopia.json\" on disk: VS Code finds this file on macOS and Windows, but not on Linux, where file names do not ignore case"
+        ]
+      },
+      {
+        "label": "Bearded Theme Aquarelle Cymbidium",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-aquarelle-cymbidium.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Aquarelle Hydrangea",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-aquarelle-hydrangea.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme Aquarelle Lilac",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-aquarelle-lilac.json",
+        "warnings": []
+      },
+      {
+        "label": "Bearded Theme OLED (Experimental)",
+        "uiTheme": "vs-dark",
+        "file": "themes/bearded-theme-oled.json",
+        "warnings": []
+      }
+    ]
+  },
+  {
+    "id": "Dracula-2.dracula-2",
+    "version": "0.3.8",
+    "warnings": [],
+    "themes": [
+      {
+        "label": "Darcula",
+        "uiTheme": "vs-dark",
+        "file": "themes/Dracula-normal.json",
+        "warnings": []
+      }
+    ]
+  },
+  {
+    "id": "bastndev.lynx-theme",
+    "version": "5.4.0",
+    "warnings": [],
+    "themes": [
+      {
+        "label": "1. DARKㅤㅤ(Lynx Theme)",
+        "uiTheme": "vs-dark",
+        "file": "src/themes/01_Lynx-Dark-theme.json",
+        "warnings": []
+      },
+      {
+        "label": "2. LIGHT ㅤ (Lynx Theme)",
+        "uiTheme": "vs",
+        "file": "src/themes/02_Lynx-Light-theme.json",
+        "warnings": []
+      },
+      {
+        "label": "3. NIGHT ㅤ(Lynx Theme)",
+        "uiTheme": "vs-dark",
+        "file": "src/themes/03_Lynx-Night-theme.json",
+        "warnings": []
+      },
+      {
+        "label": "4. GHIBLI ㅤ(Lynx Theme)",
+        "uiTheme": "vs",
+        "file": "src/themes/04_Lynx-Ghibli-theme.json",
+        "warnings": []
+      },
+      {
+        "label": "5. FURY ㅤ (Lynx Theme)",
+        "uiTheme": "vs-dark",
+        "file": "src/themes/05_Lynx-Fury-theme.json",
+        "warnings": []
+      },
+      {
+        "label": "6. KIROㅤㅤ(Lynx Theme)",
+        "uiTheme": "vs-dark",
+        "file": "src/themes/06_Lynx-Kiro-theme.json",
+        "warnings": []
+      },
+      {
+        "label": "7. NVIMㅤㅤ(Lynx Theme)",
+        "uiTheme": "vs-dark",
+        "file": "src/themes/07_Lynx-NVIM-theme.json",
+        "warnings": []
+      },
+      {
+        "label": "8. LIQUIDㅤㅤ(Lynx Theme) 🧪",
+        "uiTheme": "vs-dark",
+        "file": "src/themes/08_Lynx-Liquid-theme.json",
+        "warnings": []
+      }
+    ]
+  },
+  {
+    "id": "mvllow.rose-pine",
+    "version": "2.15.2",
+    "warnings": [],
+    "themes": [
+      {
+        "label": "Rosé Pine",
+        "uiTheme": "vs-dark",
+        "file": "themes/rose-pine-color-theme.json",
+        "warnings": []
+      },
+      {
+        "label": "Rosé Pine (no italics)",
+        "uiTheme": "vs-dark",
+        "file": "themes/rose-pine-no-italics-color-theme.json",
+        "warnings": []
+      },
+      {
+        "label": "Rosé Pine Moon",
+        "uiTheme": "vs-dark",
+        "file": "themes/rose-pine-moon-color-theme.json",
+        "warnings": []
+      },
+      {
+        "label": "Rosé Pine Moon (no italics)",
+        "uiTheme": "vs-dark",
+        "file": "themes/rose-pine-moon-no-italics-color-theme.json",
+        "warnings": []
+      },
+      {
+        "label": "Rosé Pine Dawn",
+        "uiTheme": "vs",
+        "file": "themes/rose-pine-dawn-color-theme.json",
+        "warnings": []
+      },
+      {
+        "label": "Rosé Pine Dawn (no italics)",
+        "uiTheme": "vs",
+        "file": "themes/rose-pine-dawn-no-italics-color-theme.json",
+        "warnings": []
+      }
+    ]
+  },
+  {
+    "id": "sdras.night-owl",
+    "version": "2.1.1",
+    "warnings": [],
+    "themes": [
+      {
+        "label": "Night Owl",
+        "uiTheme": "vs-dark",
+        "file": "themes/Night Owl-color-theme.json",
+        "warnings": [
+          "themes/Night Owl-color-theme.json: \"editor.findRangeHighlightBackground\" is null, not a color: VS Code ignores it",
+          "themes/Night Owl-color-theme.json: \"editor.lineHighlightBorder\" is null, not a color: VS Code ignores it",
+          "themes/Night Owl-color-theme.json: \"editorLink.activeForeground\" is null, not a color: VS Code ignores it",
+          "themes/Night Owl-color-theme.json: \"editorWhitespace.foreground\" is null, not a color: VS Code ignores it",
+          "themes/Night Owl-color-theme.json: \"editorError.border\" is null, not a color: VS Code ignores it",
+          "themes/Night Owl-color-theme.json: \"editorWarning.border\" is null, not a color: VS Code ignores it",
+          "themes/Night Owl-color-theme.json: \"merge.currentContentBackground\" is null, not a color: VS Code ignores it",
+          "themes/Night Owl-color-theme.json: \"merge.incomingContentBackground\" is null, not a color: VS Code ignores it",
+          "themes/Night Owl-color-theme.json: \"merge.border\" is null, not a color: VS Code ignores it",
+          "themes/Night Owl-color-theme.json: \"statusBar.debuggingForeground\" is null, not a color: VS Code ignores it",
+          "themes/Night Owl-color-theme.json: \"statusBar.noFolderForeground\" is null, not a color: VS Code ignores it",
+          "themes/Night Owl-color-theme.json: \"titleBar.inactiveForeground\" is null, not a color: VS Code ignores it"
+        ]
+      },
+      {
+        "label": "Night Owl (No Italics)",
+        "uiTheme": "vs-dark",
+        "file": "themes/Night Owl-color-theme-noitalic.json",
+        "warnings": [
+          "themes/Night Owl-color-theme-noitalic.json: \"editor.findRangeHighlightBackground\" is null, not a color: VS Code ignores it",
+          "themes/Night Owl-color-theme-noitalic.json: \"editor.lineHighlightBorder\" is null, not a color: VS Code ignores it",
+          "themes/Night Owl-color-theme-noitalic.json: \"editorLink.activeForeground\" is null, not a color: VS Code ignores it",
+          "themes/Night Owl-color-theme-noitalic.json: \"editorWhitespace.foreground\" is null, not a color: VS Code ignores it",
+          "themes/Night Owl-color-theme-noitalic.json: \"editorError.border\" is null, not a color: VS Code ignores it",
+          "themes/Night Owl-color-theme-noitalic.json: \"editorWarning.border\" is null, not a color: VS Code ignores it",
+          "themes/Night Owl-color-theme-noitalic.json: \"merge.currentContentBackground\" is null, not a color: VS Code ignores it",
+          "themes/Night Owl-color-theme-noitalic.json: \"merge.incomingContentBackground\" is null, not a color: VS Code ignores it",
+          "themes/Night Owl-color-theme-noitalic.json: \"merge.border\" is null, not a color: VS Code ignores it",
+          "themes/Night Owl-color-theme-noitalic.json: \"statusBar.debuggingForeground\" is null, not a color: VS Code ignores it",
+          "themes/Night Owl-color-theme-noitalic.json: \"statusBar.noFolderForeground\" is null, not a color: VS Code ignores it",
+          "themes/Night Owl-color-theme-noitalic.json: \"titleBar.inactiveForeground\" is null, not a color: VS Code ignores it"
+        ]
+      },
+      {
+        "label": "Night Owl Light",
+        "uiTheme": "vs",
+        "file": "themes/Night Owl-Light-color-theme.json",
+        "warnings": []
+      },
+      {
+        "label": "Night Owl Light (No Italics)",
+        "uiTheme": "vs",
+        "file": "themes/Night Owl-Light-color-theme-noitalic.json",
+        "warnings": []
+      }
+    ]
+  },
+  {
+    "id": "beem.monochromator",
+    "version": "0.36.2",
+    "warnings": [],
+    "themes": [
+      {
+        "label": "Monochromator Dark",
+        "uiTheme": "vs-dark",
+        "file": "themes/dark/default.json",
+        "warnings": []
+      },
+      {
+        "label": "Monochromator Dark Amber",
+        "uiTheme": "vs-dark",
+        "file": "themes/dark/amber.json",
+        "warnings": []
+      },
+      {
+        "label": "Monochromator Dark Amethyst",
+        "uiTheme": "vs-dark",
+        "file": "themes/dark/amethyst.json",
+        "warnings": []
+      },
+      {
+        "label": "Monochromator Dark Aquamarine",
+        "uiTheme": "vs-dark",
+        "file": "themes/dark/aquamarine.json",
+        "warnings": []
+      },
+      {
+        "label": "Monochromator Dark Emerald",
+        "uiTheme": "vs-dark",
+        "file": "themes/dark/emerald.json",
+        "warnings": []
+      },
+      {
+        "label": "Monochromator Dark Plain",
+        "uiTheme": "vs-dark",
+        "file": "themes/dark/plain.json",
+        "warnings": []
+      },
+      {
+        "label": "Monochromator Dark Ruby",
+        "uiTheme": "vs-dark",
+        "file": "themes/dark/ruby.json",
+        "warnings": []
+      },
+      {
+        "label": "Monochromator Dark Sulfur",
+        "uiTheme": "vs-dark",
+        "file": "themes/dark/sulfur.json",
+        "warnings": []
+      },
+      {
+        "label": "Monochromator Light",
+        "uiTheme": "vs",
+        "file": "themes/light/default.json",
+        "warnings": []
+      },
+      {
+        "label": "Monochromator Light Amber",
+        "uiTheme": "vs",
+        "file": "themes/light/amber.json",
+        "warnings": []
+      },
+      {
+        "label": "Monochromator Light Amethyst",
+        "uiTheme": "vs",
+        "file": "themes/light/amethyst.json",
+        "warnings": []
+      },
+      {
+        "label": "Monochromator Light Aquamarine",
+        "uiTheme": "vs",
+        "file": "themes/light/aquamarine.json",
+        "warnings": []
+      },
+      {
+        "label": "Monochromator Light Emerald",
+        "uiTheme": "vs",
+        "file": "themes/light/emerald.json",
+        "warnings": []
+      },
+      {
+        "label": "Monochromator Light Plain",
+        "uiTheme": "vs",
+        "file": "themes/light/plain.json",
+        "warnings": []
+      },
+      {
+        "label": "Monochromator Light Ruby",
+        "uiTheme": "vs",
+        "file": "themes/light/ruby.json",
+        "warnings": []
+      },
+      {
+        "label": "Monochromator Light Sulfur",
+        "uiTheme": "vs",
+        "file": "themes/light/sulfur.json",
+        "warnings": []
+      }
+    ]
+  },
+  {
+    "id": "akamud.vscode-theme-onelight",
+    "version": "2.3.0",
+    "warnings": [],
+    "themes": [
+      {
+        "label": "Atom One Light",
+        "uiTheme": "vs",
+        "file": "themes/OneLight.json",
+        "warnings": []
+      }
+    ]
+  },
+  {
+    "id": "vira.vsc-vira-theme",
+    "version": "2026.9.6",
+    "warnings": [],
+    "themes": [
+      {
+        "label": "Vira Teal",
+        "uiTheme": "vs-dark",
+        "file": "build/themes/Vira-Theme-Teal.json",
+        "warnings": []
+      },
+      {
+        "label": "Vira Teal High Contrast",
+        "uiTheme": "vs-dark",
+        "file": "build/themes/Vira-Theme-Teal-High-Contrast.json",
+        "warnings": []
+      },
+      {
+        "label": "Vira Graphene",
+        "uiTheme": "vs-dark",
+        "file": "build/themes/Vira-Theme-Graphene.json",
+        "warnings": []
+      },
+      {
+        "label": "Vira Graphene High Contrast",
+        "uiTheme": "vs-dark",
+        "file": "build/themes/Vira-Theme-Graphene-High-Contrast.json",
+        "warnings": []
+      },
+      {
+        "label": "Vira Palenight",
+        "uiTheme": "vs-dark",
+        "file": "build/themes/Vira-Theme-Palenight.json",
+        "warnings": []
+      },
+      {
+        "label": "Vira Palenight High Contrast",
+        "uiTheme": "vs-dark",
+        "file": "build/themes/Vira-Theme-Palenight-High-Contrast.json",
+        "warnings": []
+      },
+      {
+        "label": "Vira Ocean",
+        "uiTheme": "vs-dark",
+        "file": "build/themes/Vira-Theme-Ocean.json",
+        "warnings": []
+      },
+      {
+        "label": "Vira Ocean High Contrast",
+        "uiTheme": "vs-dark",
+        "file": "build/themes/Vira-Theme-Ocean-High-Contrast.json",
+        "warnings": []
+      },
+      {
+        "label": "Vira Deepforest",
+        "uiTheme": "vs-dark",
+        "file": "build/themes/Vira-Theme-Deepforest.json",
+        "warnings": []
+      },
+      {
+        "label": "Vira Deepforest High Contrast",
+        "uiTheme": "vs-dark",
+        "file": "build/themes/Vira-Theme-Deepforest-High-Contrast.json",
+        "warnings": []
+      },
+      {
+        "label": "Vira Carbon",
+        "uiTheme": "vs-dark",
+        "file": "build/themes/Vira-Theme-Carbon.json",
+        "warnings": []
+      },
+      {
+        "label": "Vira Carbon High Contrast",
+        "uiTheme": "vs-dark",
+        "file": "build/themes/Vira-Theme-Carbon-High-Contrast.json",
+        "warnings": []
+      },
+      {
+        "label": "Vira Anthracite",
+        "uiTheme": "vs-dark",
+        "file": "build/themes/Vira-Theme-Anthracite.json",
+        "warnings": []
+      },
+      {
+        "label": "Vira Anthracite High Contrast",
+        "uiTheme": "vs-dark",
+        "file": "build/themes/Vira-Theme-Anthracite-High-Contrast.json",
+        "warnings": []
+      },
+      {
+        "label": "Vira Montana",
+        "uiTheme": "vs-dark",
+        "file": "build/themes/Vira-Theme-Montana.json",
+        "warnings": []
+      },
+      {
+        "label": "Vira Montana High Contrast",
+        "uiTheme": "vs-dark",
+        "file": "build/themes/Vira-Theme-Montana-High-Contrast.json",
+        "warnings": []
+      },
+      {
+        "label": "Vira Sand",
+        "uiTheme": "vs-dark",
+        "file": "build/themes/Vira-Theme-Sand.json",
+        "warnings": []
+      },
+      {
+        "label": "Vira Sand High Contrast",
+        "uiTheme": "vs-dark",
+        "file": "build/themes/Vira-Theme-Sand-High-Contrast.json",
+        "warnings": []
+      },
+      {
+        "label": "Vira Clay",
+        "uiTheme": "vs-dark",
+        "file": "build/themes/Vira-Theme-Clay.json",
+        "warnings": []
+      },
+      {
+        "label": "Vira Clay High Contrast",
+        "uiTheme": "vs-dark",
+        "file": "build/themes/Vira-Theme-Clay-High-Contrast.json",
+        "warnings": []
+      }
+    ]
+  }
+]

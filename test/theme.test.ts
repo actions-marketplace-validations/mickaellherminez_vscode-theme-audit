@@ -83,6 +83,18 @@ describe('include', () => {
     assert.equal(theme.semanticHighlighting, true);
   });
 
+  test('a file whose name differs by case is read on every system, with a warning for Linux', () => {
+    const dir = folder({ 'Themes/Base.json': { colors: { 'editor.background': '#000000' } }, 'Themes/Dark.json': { include: './base.json' } });
+    const requested = join(dir, 'themes', 'dark.json');
+    const theme = loadTheme(requested);
+    assert.deepEqual(theme.files, [join(dir, 'Themes', 'Dark.json'), join(dir, 'Themes', 'Base.json')]);
+    assert.deepEqual(theme.colors, { 'editor.background': '#000000' });
+    assert.deepEqual(theme.warnings, [
+      { file: requested, message: '"themes" is named "Themes", "dark.json" is named "Dark.json" on disk: VS Code finds this file on macOS and Windows, but not on Linux, where file names do not ignore case' },
+      { file: join(dir, 'Themes', 'base.json'), message: '"base.json" is named "Base.json" on disk: VS Code finds this file on macOS and Windows, but not on Linux, where file names do not ignore case' },
+    ]);
+  });
+
   test('a theme that includes itself is refused', () => {
     const dir = folder({ 'a.json': { include: './b.json' }, 'b.json': { include: './a.json' } });
     assert.throws(() => loadTheme(join(dir, 'a.json')), /includes itself/);

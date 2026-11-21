@@ -108,7 +108,8 @@ Requires Node.js 22.18 or later, which runs the TypeScript sources directly.
 
 ```sh
 npm ci
-npm run check   # lint, type check, tests, then build to dist/
+npm run check         # lint, type check, tests, then build to dist/
+npm run test:corpus   # the 178 themes of 20 Open VSX extensions, downloaded once
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
