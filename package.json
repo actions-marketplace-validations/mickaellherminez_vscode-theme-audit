@@ -1,6 +1,6 @@
 {
   "name": "vscode-theme-audit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Accessibility audit for VS Code color themes: WCAG contrast and color blindness simulations, for theme authors and CI.",
   "keywords": [
     "vscode",

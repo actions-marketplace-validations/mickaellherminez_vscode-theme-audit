@@ -17,7 +17,7 @@ The report of a test theme of this repository, with each list cut to one entry:
 ```json
 {
   "format": 1,
-  "tool": { "name": "vscode-theme-audit", "version": "0.1.0" },
+  "tool": { "name": "vscode-theme-audit", "version": "0.1.1" },
   "vscode": { "version": "1.147.0", "commit": "8a14f0cc1b08d531eb83255ea3764ae22aa932b5" },
   "strict": false,
   "minimumDeltaE2000": 7,

@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-22
+
+### Changed
+- Published with npm trusted publishing only (OpenID Connect from the release workflow, no token), with its provenance. 0.1.0 was published once with a short-lived token, since npm configures trusted publishing only for a package that exists. The code of the package does not change; the README shows the new version in its examples ([#13](https://github.com/mickaellherminez/vscode-theme-audit/issues/13)).
+
 ## [0.1.0] - 2026-11-22
 
 ### Added
