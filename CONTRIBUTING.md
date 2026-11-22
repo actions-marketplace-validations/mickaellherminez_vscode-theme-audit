@@ -222,10 +222,10 @@ npm can configure a trusted publisher only for a package that already exists. Th
 1. On npmjs.com, **Access Tokens**, **Generate New Token**: a granular access token with the permission *Read and write (publish and stage)* on *All Packages* (the package does not exist yet), *Bypass two-factor authentication* checked (the workflow cannot type a code), and the shortest expiration (1 day).
 2. On GitHub, in the settings of the repository, **Environments**, `npm`: a secret `NPM_TOKEN` with this token. The workflow gives it to npm as `NODE_AUTH_TOKEN`.
 3. Push the tag `v0.1.0`, as above.
-4. Once 0.1.0 is on npm: in the settings of the package on npmjs.com, **Trusted Publisher**, GitHub Actions, with the user `mickaellherminez`, the repository `vscode-theme-audit`, the workflow `release.yml` and the environment `npm`. In **Publishing access**, choose *Require two-factor authentication and disallow tokens*.
+4. Once 0.1.0 is on npm: in the settings of the package on npmjs.com, **Trusted Publisher**, GitHub Actions, with the user `mickaellherminez`, the repository `vscode-theme-audit`, the workflow `release.yml` and the environment `npm`. Under **Allowed actions**, check *Allow `npm publish`*: the workflow publishes directly. npm advises against it and prefers staged publishing, where each version waits for a maintainer to approve it with two-factor authentication; the workflow would then run `npm stage publish`. Then **Set up connection**. In **Publishing access**, choose *Require two-factor authentication and disallow bypass 2fa tokens*, then **Update Package Settings**.
 5. Delete the secret `NPM_TOKEN` on GitHub and the token on npmjs.com.
 
-From then on, the workflow publishes without a token. npm checks the configuration only when it publishes: the next release shows whether it is right.
+From then on, the workflow publishes without a token. A new trusted publisher stays *Pending validation* until a version is published with it, which must happen within 2 days: 0.1.1 was published for that, without a token. If a connection expires before a release, delete it and create it again with the same fields, just before pushing the tag.
 
 ### Going back
 
