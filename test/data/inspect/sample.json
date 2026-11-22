@@ -1,0 +1,13 @@
+{
+  // A sample for the check with Inspect Editor Tokens and Scopes
+  "name": "sample",
+  "version": "1.0.0",
+  "private": true,
+  "count": 42,
+  "ratio": -0.5e3,
+  "nothing": null,
+  "tags": ["a", "b\n", "c"],
+  "nested": {
+    "deep": { "key": false }
+  }
+}

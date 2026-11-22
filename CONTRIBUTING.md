@@ -51,6 +51,31 @@ In many languages, a language server classifies names (a read-only `variable`, a
 
 `test/semantic.test.ts` starts with the tests of VS Code (`tokenStyleResolving.test.ts`). The `semanticTokenScopes` and token types of other extensions, and the user setting `editor.semanticTokenColorCustomizations`, are not read.
 
+### Checked in the editor of VS Code
+
+The tests above compare the ports with vscode-textmate and with the tests of VS Code. `scripts/vscode-inspect.ts` checks the whole chain in the editor itself: the grammars of VS Code, the semantic tokens of its TypeScript server, and the themes as VS Code loads them. It starts VS Code as `scripts/vscode-oracle.ts` does (`scripts/vscode-run.ts`: a temporary profile, deleted at the end, and extension copies without their code), opens the samples of [`test/data/inspect/`](test/data/inspect/) (TypeScript, Python, JSON with comments and Markdown), and opens the widget of **Developer: Inspect Editor Tokens and Scopes**. It then clicks the start of each word, and of each other run of characters, and checks in the status bar that the cursor is there. For each place, it records the TextMate scopes and the semantic token type and modifiers that the widget shows, the color of the widget, and the color and font style of the text on screen.
+
+```sh
+# macOS, with VS Code in /Applications; elsewhere, give the executable with --code. The window must stay open,
+# without clicks, until the script ends (about 3 minutes per theme).
+npm run corpus
+mkdir -p ../vti && for id in zhuangtongfa.material-theme sdras.night-owl Catppuccin.catppuccin-vsc enkia.tokyo-night GitHub.github-vscode-theme; do
+  mkdir -p ../vti/$id && unzip -qo .cache/corpus/$id-*.vsix 'extension/*' -d ../vti/$id; done
+node scripts/vscode-inspect.ts --work ../vti/tmp \
+  --theme 'One Dark Pro' --theme 'Night Owl' --theme 'Catppuccin Latte' --theme 'Tokyo Night Light' --theme 'GitHub Dark High Contrast' \
+  test/data/vscode-inspect.json test/data/inspect ../vti/*/extension
+```
+
+`test/corpus/inspect.test.ts`, part of `npm run test:corpus`, gives these scopes and semantic tokens to the package (`TokenColors`, `SemanticTokenColors`, `withSemantic`) and checks that it finds the same color, bold, italic, underline and strikethrough. The five themes cover a dark theme with semantic rules (One Dark Pro), a dark theme without semantic highlighting (Night Owl), a light theme with semantic rules (Catppuccin Latte), a light theme whose semantic rules are off because it does not enable semantic highlighting (Tokyo Night Light), and a high contrast theme with semantic highlighting but no rules, where VS Code probes TextMate scopes (GitHub Dark High Contrast). The record gives each distinct token once per theme.
+
+On November 22, 2026, with VS Code 1.147.0 on macOS: 2,921 places in the five themes, 1,556 distinct tokens, 0 difference. On 20 of these places, the semantic token changes the TextMate style, and the package finds it too.
+
+The script turns off what VS Code draws over the token colors, so that the text shows the token style alone: bracket pair colors, faded unused code, struck through deprecated code, inlay hints, links and the other settings written in the record. With the default settings, they change some tokens on screen, over the token colors that the audit measures. What this check does not cover:
+
+- the package does not tokenize code: the scopes come from the grammars of VS Code, and the check shows that, given these scopes, the package finds the style of VS Code;
+- only the TypeScript server gives semantic tokens here: Python, JSON and Markdown have none without other extensions;
+- the record comes from the version of VS Code that ran the script, which must be the pinned release (the test checks it). To record again after a change of the pinned release, run the script, read the diff of `test/data/vscode-inspect.json`, and run `npm run test:corpus`. To go back, check out the previous file from git.
+
 ## Default colors
 
 A theme almost never sets all the workbench colors. For a key it leaves out, VS Code shows the default that the key was registered with (`registerColor` in its sources): one value per theme type (light, dark, high contrast dark, high contrast light), which is a color, the id of another color, a transform of other colors (`transparent`, `darken`, `oneOf`...), or nothing. `src/colors.ts` ports how VS Code resolves them: `Color` of `color.ts`, `resolveColorValue` and `executeTransform` of `colorUtils.ts`, `getColor` and `defines` of `colorThemeData.ts`, and the `contributes.colors` of an extension (`colorExtensionPoint.ts`).
@@ -139,7 +164,7 @@ The package is also tested on real themes: the 20 most downloaded extensions of 
 The `.vsix` files are not committed: not every license of these extensions allows it, some have terms of their own and one gives no license. `npm run corpus` (`scripts/corpus.ts`) downloads those that are missing from Open VSX into `.cache/corpus/`, ignored by git, and checks their SHA-256. It needs the network once; after that, the files come from the cache.
 
 ```sh
-npm run test:corpus   # download what is missing, then run test/corpus/corpus.test.ts
+npm run test:corpus   # download what is missing, then run test/corpus/*.test.ts
 ```
 
 The test extracts each `.vsix` into a temporary folder as VS Code installs it: with [yauzl](https://github.com/thejoshwolfe/yauzl), the zip library of VS Code (a development dependency), only the entries under `extension`. It audits each extension in both modes and checks that nothing crashes, that each report is valid against its schema, and that the themes and warnings are those of [`test/corpus/expected.json`](test/corpus/expected.json): the empty colors of Monokai Pro, the `null` values of Night Owl, the arrays of GitHub Theme. It does not compare the measures: the other tests do that. `npm test` does not run it, so that it stays offline.
