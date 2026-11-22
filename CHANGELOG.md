@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Added
+- The CI runs the checks and the corpus test on Linux, Windows and macOS, with Node.js 22 and 24. `npm run test:package` checks the content of the package that npm publishes (the compiled code, the JSON schema, README, LICENSE, CHANGELOG and THIRD-PARTY-NOTICES) and its size: 120 kB at most, 500 kB unpacked; `npm run check` runs it too. The package now contains the CHANGELOG ([#14](https://github.com/mickaellherminez/vscode-theme-audit/issues/14)).
+
 ## [0.1.1] - 2026-11-22
 
 ### Changed
