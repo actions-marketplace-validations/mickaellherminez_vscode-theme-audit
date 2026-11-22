@@ -1,0 +1,5 @@
+# Line feeds in every text file, on every system: the tests compare outputs and data byte for byte, and Git on
+# Windows would otherwise check them out with CRLF
+* text=auto eol=lf
+*.png binary
+*.vsix binary

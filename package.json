@@ -37,6 +37,7 @@
   "files": [
     "dist",
     "schema",
+    "CHANGELOG.md",
     "THIRD-PARTY-NOTICES.md"
   ],
   "engines": {
@@ -53,7 +54,8 @@
     "test": "node --test \"test/*.test.ts\"",
     "corpus": "node scripts/corpus.ts",
     "test:corpus": "node scripts/corpus.ts && node --test \"test/corpus/*.test.ts\"",
-    "check": "npm run lint && npm run typecheck && npm test && npm run build"
+    "check": "npm run lint && npm run typecheck && npm test && npm run build && node --test \"test/package/*.test.ts\"",
+    "test:package": "npm run build && node --test \"test/package/*.test.ts\""
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

@@ -2,7 +2,7 @@
 // _loadColorTheme, and themeCompatibility.ts, convertSettings; checked on microsoft/vscode 1.147.0).
 // Copyright (c) Microsoft Corporation for the rules of VS Code. Licensed under the MIT License: see THIRD-PARTY-NOTICES.md.
 
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, extname, join, parse, resolve, sep } from 'node:path';
 
 import { parse as parseJsonc, printParseErrorCode } from 'jsonc-parser';
@@ -204,9 +204,14 @@ function onDisk(file: string): { path: string; renamed: string[] } {
     let actual = name;
     if (!names.includes(name)) {
       const matches = names.filter((n) => n.toLowerCase() === name.toLowerCase());
-      if (matches.length !== 1 || matches[0] === undefined) return { path: file, renamed: [] };
-      actual = matches[0];
-      renamed.push(`"${name}" is named "${actual}"`);
+      if (matches.length === 1 && matches[0] !== undefined) {
+        actual = matches[0];
+        renamed.push(`"${name}" is named "${actual}"`);
+      } else if (!existsSync(join(path, name))) {
+        return { path: file, renamed: [] };
+      }
+      // Otherwise the name exists without being listed: a short 8.3 name on Windows, such as RUNNER~1 for
+      // runneradmin in the temporary folder. It is kept, and the next names are checked
     }
     path = join(path, actual);
   }

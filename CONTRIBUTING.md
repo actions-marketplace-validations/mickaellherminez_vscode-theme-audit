@@ -33,7 +33,7 @@ What VS Code does, and the package with it:
 
 Where the package departs from VS Code, so that the audit gives the same result on every system:
 
-- A theme file or an `include` whose path differs from the file name only by case (`theme.json` for `Theme.json`) is found by VS Code on macOS and Windows, where file names usually ignore case, but not on Linux. The package reads it on every system, with a warning. Bearded Theme 10.1.0, in the corpus, has one.
+- A theme file or an `include` whose path differs from the file name only by case (`theme.json` for `Theme.json`) is found by VS Code on macOS and Windows, where file names usually ignore case, but not on Linux. The package reads it on every system, with a warning. Bearded Theme 10.1.0, in the corpus, has one. A folder that exists without being listed, such as a short 8.3 name on Windows (`RUNNER~1` for `runneradmin`), is kept as written, and the names after it are still checked.
 
 ## Token colors
 
@@ -187,11 +187,14 @@ To go back, check out `test/corpus/` from git and run `npm run test:corpus`: the
 | `npm run lint` | ESLint, with the strict type-checked rules of typescript-eslint |
 | `npm run typecheck` | TypeScript, without writing files |
 | `npm test` | The tests of `test/*.test.ts`, with the test runner of Node.js, without the network |
-| `npm run build` | Compiles `src/` to `dist/`, the only folder published to npm |
+| `npm run build` | Compiles `src/` to `dist/`, the only folder of code published to npm |
+| `npm run test:package` | Builds, then checks the content of the package that npm would publish (`test/package/`): `dist/`, the JSON schema, README, LICENSE, CHANGELOG and THIRD-PARTY-NOTICES only, under 120 kB (500 kB unpacked) |
 | `npm run check` | All of the above, in this order |
 | `npm run test:corpus` | The corpus test, after downloading what the cache lacks |
 
-The [CI workflow](.github/workflows/ci.yml) runs them on every push and pull request, with Node.js 22 and 24. It also runs the built command and lists the content of the package (`npm pack --dry-run`). Its corpus job keeps the `.vsix` files in a GitHub Actions cache, downloaded again only when `extensions.json` changes.
+The [CI workflow](.github/workflows/ci.yml) runs them on every push and pull request, on Linux, Windows and macOS, with Node.js 22 and 24: theme authors use all three, and paths (`include`, `tokenColors` as a file, extension folders) differ between them. It also runs the built command. Its corpus job runs on the same systems, and keeps the `.vsix` files in a GitHub Actions cache, downloaded again only when `extensions.json` changes. `.gitattributes` keeps line feeds in every text file, so that Windows checks out the same bytes as the other systems.
+
+The size limit of the package is in `test/package/package.test.ts` (`MAX_SIZE`, `MAX_UNPACKED_SIZE`). When the package grows on purpose, raise it in the same pull request and say why; `npm pack --dry-run` gives the sizes. A file added to the package (`files` in `package.json`) is added to the list of that test.
 
 The [CodeQL workflow](.github/workflows/codeql.yml) looks for security problems in the TypeScript code and in the workflows, on every pull request to `main`, on `main` and every Monday. Its results are in the Security tab.
 
