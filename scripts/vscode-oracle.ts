@@ -14,19 +14,19 @@
 // with --extensionDevelopmentPath from copies without code (no `main` or `browser`), and remote debugging on a
 // local port. Each theme is selected by writing workbench.colorTheme in the settings of the temporary profile.
 
-import { spawn } from 'node:child_process';
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { basename, dirname, join, relative, resolve } from 'node:path';
+import { join, relative, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 
 import { Color } from '../src/colors.ts';
 import { extensionThemes, loadTheme } from '../src/theme.ts';
+import { BASE_SETTINGS, MACOS_CODE, Session, copyExtension, launch, settingsId, sleep, vscodeVersion, workbenchPage, writeUserFile } from './vscode-run.ts';
 
 const { values: options, positionals } = parseArgs({
   allowPositionals: true,
   options: {
-    code: { type: 'string', default: '/Applications/Visual Studio Code.app/Contents/MacOS/Code' },
+    code: { type: 'string', default: MACOS_CODE },
     keys: { type: 'string' },
     work: { type: 'string', default: tmpdir() },
     port: { type: 'string', default: '9337' },
@@ -46,42 +46,22 @@ function cssName(key: string): string {
 const keys = options.keys === undefined ? undefined : readFileSync(options.keys, 'utf8').split('\n')
   .map((line) => line.replace(/#.*/, '').trim()).filter((line) => line.length > 0);
 
-// The version of VS Code: resources/app next to the executable, or Contents/Resources/app on macOS
-const app = options.code.includes('.app/Contents/MacOS/')
-  ? resolve(dirname(options.code), '../Resources/app')
-  : resolve(dirname(options.code), 'resources/app');
-const { commit } = JSON.parse(readFileSync(join(app, 'product.json'), 'utf8')) as { commit: string };
-const { version } = JSON.parse(readFileSync(join(app, 'package.json'), 'utf8')) as { version: string };
+const { version, commit } = vscodeVersion(options.code);
 
 mkdirSync(options.work, { recursive: true });
 const work = mkdtempSync(join(options.work, 'vto-'));
 const userData = join(work, 'user-data');
-const baseSettings = {
-  'window.restoreWindows': 'none', 'workbench.startupEditor': 'none', 'telemetry.telemetryLevel': 'off',
-  'update.mode': 'none', 'extensions.autoUpdate': false, 'extensions.autoCheckUpdates': false,
-  'workbench.enableExperiments': false, 'security.workspace.trust.enabled': false, 'chat.disableAIFeatures': true,
-};
 function writeSettings(theme: string): void {
-  mkdirSync(join(userData, 'User'), { recursive: true });
-  writeFileSync(join(userData, 'User', 'settings.json'), JSON.stringify({ ...baseSettings, 'workbench.colorTheme': theme }, null, 2));
+  writeUserFile(userData, 'settings.json', { ...BASE_SETTINGS, 'workbench.colorTheme': theme });
 }
 
 interface Entry { extension: string; settingsId: string; label: string; path: string; uiTheme: string; colors: Record<string, string> }
 const entries: Entry[] = [];
 const copies: string[] = [];
 for (const [i, folder] of folders.entries()) {
-  // A copy without code: some theme extensions write their theme files when they run
-  const copy = join(work, 'extensions', `${String(i)}-${basename(resolve(folder))}`);
-  cpSync(folder, copy, { recursive: true, dereference: true, filter: (source) => !/[/\\](node_modules|\.git)([/\\]|$)/.test(source) });
-  const manifestFile = join(copy, 'package.json');
-  const manifest = JSON.parse(readFileSync(manifestFile, 'utf8')) as { contributes?: { themes?: { id?: unknown; path?: unknown }[] } } & Record<string, unknown>;
-  for (const key of ['main', 'browser', 'activationEvents', 'extensionDependencies', 'extensionPack']) Reflect.deleteProperty(manifest, key);
-  writeFileSync(manifestFile, JSON.stringify(manifest, null, 2));
+  const { copy, manifest } = copyExtension(folder, work, i);
   copies.push(copy);
-  const contributed = manifest.contributes?.themes ?? [];
   for (const theme of extensionThemes(folder).themes) {
-    // workbench.colorTheme names a theme by its `id` when it has one, otherwise by its label (settingsId of VS Code)
-    const id = contributed.find((c) => typeof c.path === 'string' && resolve(folder, c.path) === theme.path)?.id;
     let colors: Record<string, string> = {};
     try {
       colors = loadTheme(theme.path).colors;
@@ -89,7 +69,7 @@ for (const [i, folder] of folders.entries()) {
       // A theme that the package refuses: VS Code is still asked
     }
     entries.push({
-      extension: relative(process.cwd(), folder) || '.', settingsId: typeof id === 'string' ? id : theme.label,
+      extension: relative(process.cwd(), folder) || '.', settingsId: settingsId(folder, manifest, theme),
       label: theme.label, path: relative(resolve(folder), theme.path), uiTheme: theme.uiTheme, colors,
     });
   }
@@ -100,73 +80,7 @@ for (const entry of entries) used.set(entry.settingsId, (used.get(entry.settings
 // Start on a built-in theme: at startup, VS Code applies the setting before it loads the extensions, and keeps its
 // fallback theme
 writeSettings('Default High Contrast');
-const child = spawn(options.code, [
-  `--user-data-dir=${userData}`, `--extensions-dir=${join(work, 'extensions-installed')}`,
-  `--remote-debugging-port=${options.port}`, '--disable-workspace-trust', '--skip-welcome', '--skip-release-notes',
-  '--disable-telemetry', '--new-window', ...copies.map((copy) => `--extensionDevelopmentPath=${copy}`),
-], {
-  stdio: 'ignore',
-  // Variables of a VS Code that runs this script: ELECTRON_RUN_AS_NODE would start VS Code as Node.js
-  env: Object.fromEntries(Object.entries(process.env).filter(([key]) => key !== 'ELECTRON_RUN_AS_NODE' && !key.startsWith('VSCODE_'))),
-});
-
-const sleep = (ms: number) => new Promise((done) => setTimeout(done, ms));
-
-/** The WebSocket of the workbench page, once VS Code has started. */
-async function workbenchPage(): Promise<string> {
-  for (let attempt = 0; attempt < 120; attempt++) {
-    try {
-      const response = await fetch(`http://127.0.0.1:${options.port}/json/list`);
-      const targets = await response.json() as { type: string; url: string; webSocketDebuggerUrl: string }[];
-      const target = targets.find((t) => t.type === 'page' && t.url.includes('workbench'));
-      if (target) return target.webSocketDebuggerUrl;
-    } catch {
-      // Not started yet
-    }
-    await sleep(500);
-  }
-  throw new Error('VS Code did not start');
-}
-
-/** A Chrome DevTools Protocol session, to evaluate expressions in the page. */
-class Session {
-  private readonly socket: WebSocket;
-  private id = 0;
-  private readonly pending = new Map<number, (value: unknown) => void>();
-
-  private constructor(socket: WebSocket) {
-    this.socket = socket;
-    socket.addEventListener('message', (event) => {
-      const message = JSON.parse(String(event.data)) as { id?: unknown; result?: unknown };
-      // Only the answers to our own requests: a number id that one of them is waiting for
-      if (typeof message.id !== 'number') return;
-      const done = this.pending.get(message.id);
-      if (typeof done !== 'function') return;
-      this.pending.delete(message.id);
-      done(message.result);
-    });
-  }
-
-  static async open(url: string): Promise<Session> {
-    const socket = new WebSocket(url);
-    await new Promise((done, reject) => {
-      socket.addEventListener('open', done);
-      socket.addEventListener('error', reject);
-    });
-    return new Session(socket);
-  }
-
-  async evaluate(expression: string): Promise<unknown> {
-    const id = ++this.id;
-    const result = new Promise((done) => this.pending.set(id, done));
-    this.socket.send(JSON.stringify({ id, method: 'Runtime.evaluate', params: { expression, returnByValue: true } }));
-    return ((await result) as { result: { value: unknown } }).result.value;
-  }
-
-  close(): void {
-    this.socket.close();
-  }
-}
+const child = launch(options.code, work, options.port, copies);
 
 // The rule `.monaco-workbench { --vscode-...: ...; }` that VS Code writes for the theme, as an object
 const READ_CSS = `(() => {
@@ -205,7 +119,7 @@ async function show(session: Session, entry: Entry, previous: string): Promise<{
 
 const themes: (Omit<Entry, 'colors'> & { applied: boolean; colors: Record<string, string | null> })[] = [];
 try {
-  const session = await Session.open(await workbenchPage());
+  const session = await Session.open(await workbenchPage(options.port));
   // The extensions load after the window: a theme selected before is not found, and VS Code shows another one
   await sleep(5000);
   let previous = await session.evaluate(READ_CLASSES) as string;
