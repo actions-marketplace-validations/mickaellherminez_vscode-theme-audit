@@ -2,7 +2,7 @@
 
 Accessibility audit for VS Code color themes, for theme authors and their CI: WCAG contrast of the text and the code, and color pairs that must stay distinct with color blindness simulations.
 
-> **Status: in progress, not published on npm yet.** The reading engine, the checks and the command work from the sources (see [From the sources](#from-the-sources)). The commands with `npx` and `npm install` below work once version 0.1.0 is published.
+> **Status: 0.1.0, the first release.** Planned next: auditing a `.vsix` file or an Open VSX id, a configuration file, and a GitHub Action ([milestones](https://github.com/mickaellherminez/vscode-theme-audit/milestones)).
 
 ## Where it comes from
 
@@ -43,7 +43,7 @@ Then `npm run audit:themes`.
 
 ### From the sources
 
-Until the package is on npm, run it from a clone of this repository:
+To run the development version, from a clone of this repository:
 
 ```sh
 git clone https://github.com/mickaellherminez/vscode-theme-audit.git
@@ -84,7 +84,7 @@ Outside strict mode, a color that VS Code does not show, and the styles of WCAG 
 The text report starts with the version of the package and of VS Code whose colors it uses. Then, for each theme, its name, its type and its file, followed by one line per problem. This is an excerpt of the report of a test theme of this repository (`test/data/oracle-extension/themes/dark.json`), which sets few colors:
 
 ```text
-vscode-theme-audit 0.0.0, colors of VS Code 1.147.0
+vscode-theme-audit 0.1.0, colors of VS Code 1.147.0
 
 Oracle Dark (vs-dark): test/data/oracle-extension/themes/dark.json
   FAIL     Line numbers: #858585 on #1B2230  4.32 < 4.5
@@ -115,7 +115,7 @@ To fix a failure, change the color named in the line: a check named `foreground 
 ```jsonc
 {
   "format": 1,                                   // the version of this format
-  "tool": { "name": "vscode-theme-audit", "version": "0.0.0" },
+  "tool": { "name": "vscode-theme-audit", "version": "0.1.0" },
   "vscode": { "version": "1.147.0", "commit": "8a14f0cc1b08d531eb83255ea3764ae22aa932b5" },
   "strict": false,
   "minimumDeltaE2000": 7,

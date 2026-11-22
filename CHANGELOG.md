@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-11-22
+
 ### Added
 - Releases from GitHub Actions: pushing a version tag (`v0.1.0`) runs `.github/workflows/release.yml`, which checks that the tag is on `main` and matches `package.json`, runs `npm run check`, publishes to npm with trusted publishing (OpenID Connect, no stored token) and provenance, then creates the GitHub release with the notes of this CHANGELOG (`scripts/release-notes.ts`). `package.json` is no longer private, with `publishConfig` for a public package with provenance. The steps, the first version and how to go back are in CONTRIBUTING ([#13](https://github.com/mickaellherminez/vscode-theme-audit/issues/13)).
 - Documentation for theme authors: the README gives every way to run the command (`npx`, a global install, a project dependency, the API), its options and exit codes, how to read the text report, a GitHub Actions job, the limits and how to uninstall it or remove it from a CI. `docs/checks.md` lists every check with its keys, its minimum and its references (WCAG 2.2, CIEDE2000, Machado 2009, Brettel 1997, Viénot 1999), and `docs/report-format.md` describes the JSON report field by field, with an example ([#12](https://github.com/mickaellherminez/vscode-theme-audit/issues/12)).
