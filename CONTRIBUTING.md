@@ -33,7 +33,7 @@ What VS Code does, and the package with it:
 
 Where the package departs from VS Code, so that the audit gives the same result on every system:
 
-- A theme file or an `include` whose path differs from the file name only by case (`theme.json` for `Theme.json`) is found by VS Code on macOS and Windows, where file names usually ignore case, but not on Linux. The package reads it on every system, with a warning. Bearded Theme 10.1.0, in the corpus, has one.
+- A theme file or an `include` whose path differs from the file name only by case (`theme.json` for `Theme.json`) is found by VS Code on macOS and Windows, where file names usually ignore case, but not on Linux. The package reads it on every system, with a warning. Bearded Theme 10.1.0, in the corpus, has one. A folder that exists without being listed, such as a short 8.3 name on Windows (`RUNNER~1` for `runneradmin`), is kept as written, and the names after it are still checked.
 
 ## Token colors
 

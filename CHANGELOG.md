@@ -9,6 +9,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 ### Added
 - The CI runs the checks and the corpus test on Linux, Windows and macOS, with Node.js 22 and 24. `npm run test:package` checks the content of the package that npm publishes (the compiled code, the JSON schema, README, LICENSE, CHANGELOG and THIRD-PARTY-NOTICES) and its size: 120 kB at most, 500 kB unpacked; `npm run check` runs it too. The package now contains the CHANGELOG ([#14](https://github.com/mickaellherminez/vscode-theme-audit/issues/14)).
 
+### Fixed
+- On Windows, a theme file whose name differs only by case was read without its warning when its path went through a short 8.3 folder name, such as the temporary folder (`C:\Users\RUNNER~1\...`): the check of the names stopped there. Such a name is now kept and the next names are still checked ([#14](https://github.com/mickaellherminez/vscode-theme-audit/issues/14)).
+
 ## [0.1.1] - 2026-11-22
 
 ### Changed
