@@ -118,7 +118,7 @@ The code ported from Microsoft keeps its MIT license notice: see [THIRD-PARTY-NO
 
 ## What the audit checks
 
-`src/audit.ts` ports the checks of [`audit.py`](https://github.com/mickaellherminez/365-daynight-vscode-theme-ext/blob/main/scripts/themes/audit.py) and [`variety.py`](https://github.com/mickaellherminez/365-daynight-vscode-theme-ext/blob/main/scripts/themes/variety.py) of 365 Day & Night. `auditTheme()` checks one theme, `auditVariety()` compares the themes of one type in an extension.
+`src/audit.ts` ports the checks of [`audit.py`](https://github.com/mickaellherminez/365-daynight-vscode-theme-ext/blob/main/scripts/themes/audit.py) and [`variety.py`](https://github.com/mickaellherminez/365-daynight-vscode-theme-ext/blob/main/scripts/themes/variety.py) of 365 Day & Night. `auditTheme()` checks one theme, `auditVariety()` compares the themes of one type in an extension. Every check, with its keys and its minimum, is listed for users in [docs/checks.md](docs/checks.md): a check added, removed or changed updates that page in the same pull request.
 
 | Check | What it measures | Why |
 | --- | --- | --- |
@@ -195,6 +195,18 @@ The [CI workflow](.github/workflows/ci.yml) runs them on every push and pull req
 
 The [CodeQL workflow](.github/workflows/codeql.yml) looks for security problems in the TypeScript code and in the workflows, on every pull request to `main`, on `main` and every Monday. Its results are in the Security tab.
 
+## Documentation
+
+| File | For | Content |
+| --- | --- | --- |
+| [README.md](README.md) | Theme authors | Every way to run it, the options and exit codes, how to read the report, the CI, the API, the limits, how to uninstall |
+| [docs/checks.md](docs/checks.md) | Theme authors | Every check, its keys, its minimum and its references |
+| [docs/report-format.md](docs/report-format.md) | CI and scripts | The JSON report, field by field |
+| [CHANGELOG.md](CHANGELOG.md) | Everyone | The changes of each release |
+| This file | Contributors | How the package follows VS Code, and how it is tested |
+
+The examples of the README and of `docs/` are real outputs of the command on the test themes of `test/data/oracle-extension/`: after a change of the checks or of the report, run the command again and update them. The README is published on npm with the package, and links to the other files of the repository.
+
 ## Pull requests
 
-Each change starts from an issue, and its pull request links to it. Describe what changes, what you checked, and update the [CHANGELOG](CHANGELOG.md).
+Each change starts from an issue, and its pull request links to it. Describe what changes, what you checked, and update the [CHANGELOG](CHANGELOG.md) and the documentation that the change touches.
