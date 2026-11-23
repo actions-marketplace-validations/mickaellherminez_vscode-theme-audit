@@ -129,7 +129,8 @@ test('a missing path cannot inject HTML, mentions or workflow commands through t
   assert.equal(result.out, '');
   assert.match(result.err, /no such file or folder/);
   assert.equal(result.err.split('\n').length, 2);
-  assert.doesNotMatch(result.summary, /<script>|@owner/);
+  assert.equal(result.summary.includes('<script>'), false);
+  assert.equal(result.summary.includes('@owner'), false);
   assert.match(result.summary, /&lt;script&gt;&#64;owner/);
 });
 
