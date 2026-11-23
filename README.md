@@ -26,10 +26,10 @@ The command reads every theme that the `package.json` declares (`contributes.the
 
 | How | Command | When |
 | --- | --- | --- |
-| Without installing | `npx vscode-theme-audit <paths>` | Once, or now and then. npx downloads the package into its cache on the first run |
-| Global install | `npm install --global vscode-theme-audit`, then `vscode-theme-audit <paths>` | On your computer, for several projects |
-| Project dependency | `npm install --save-dev vscode-theme-audit`, then `npx vscode-theme-audit <paths>` or a script of `package.json` | In a theme project and its CI: the version is fixed in `package-lock.json` |
-| TypeScript or JavaScript API | `import { auditPaths } from 'vscode-theme-audit'` | In your own scripts (see [API](#api)) |
+| Without installing | `npx vscode-theme-audit <themes>` | Once, or now and then. npx downloads the package into its cache on the first run |
+| Global install | `npm install --global vscode-theme-audit`, then `vscode-theme-audit <themes>` | On your computer, for several projects |
+| Project dependency | `npm install --save-dev vscode-theme-audit`, then `npx vscode-theme-audit <themes>` or a script of `package.json` | In a theme project and its CI: the version is fixed in `package-lock.json` |
+| TypeScript or JavaScript API | `import { auditInputs } from 'vscode-theme-audit'` | In your own scripts (see [API](#api)) |
 
 As a script of your `package.json`, after `npm install --save-dev vscode-theme-audit`:
 
@@ -59,12 +59,21 @@ node src/cli.ts path/to/my-extension
 ```sh
 vscode-theme-audit path/to/my-extension                   # every theme of an extension folder (its package.json)
 vscode-theme-audit path/to/themes/my-color-theme.json     # one theme file
-vscode-theme-audit ext-one ext-two/themes/night.json      # several paths at once
+vscode-theme-audit my-theme-1.2.3.vsix                    # a packaged extension, as vsce package writes it
+vscode-theme-audit open-vsx:publisher.name                # the latest version of an extension of Open VSX
+vscode-theme-audit open-vsx:publisher.name@1.2.3          # a version of it
+vscode-theme-audit ext-one ext-two/themes/night.json      # several at once
 vscode-theme-audit path/to/my-extension --json > audit.json   # the report as JSON, for CI
 vscode-theme-audit path/to/my-extension --strict          # the rules of 365 Day & Night
 ```
 
-A path is a theme file or an extension folder. A folder must contain a `package.json` that declares its themes; the command does not search subfolders. A theme file takes its type (light, dark, high contrast) and its name from the extension that declares it, the nearest `package.json` above it. Without one, its type comes from its `type` field (`light`, `dark`, `hc`, `hcLight`), or it is audited as dark, as VS Code shows it, with a warning.
+Each argument is a theme file, an extension folder, a `.vsix` file or an Open VSX id. A folder must contain a `package.json` that declares its themes; the command does not search subfolders.
+
+- **A `.vsix` file** is extracted into a temporary folder as VS Code installs it, audited, and the folder is deleted. The report names its themes by the `.vsix` and their path inside it: `my-theme-1.2.3.vsix/extension/themes/dark.json`. To audit your extension as you publish it, run `npx @vscode/vsce package` first, then audit the `.vsix` it writes.
+- **An Open VSX id**, `open-vsx:publisher.name` or `open-vsx:publisher.name@version`, is downloaded from [Open VSX](https://open-vsx.org/) through its public API: the latest version, or the one given. The package checks the download against the SHA-256 that Open VSX publishes, then audits it as a `.vsix`. The report names it with the version found: `open-vsx:publisher.name@1.2.3/extension/themes/dark.json`. This is the only case where the command uses the network.
+- **The Visual Studio Marketplace** has no such id: its download API is not documented, so the package does not use it. Audit a `.vsix` instead: your own, or one you already have.
+
+ A theme file takes its type (light, dark, high contrast) and its name from the extension that declares it, the nearest `package.json` above it. Without one, its type comes from its `type` field (`light`, `dark`, `hc`, `hcLight`), or it is audited as dark, as VS Code shows it, with a warning.
 
 | Option | Effect |
 | --- | --- |
@@ -218,12 +227,16 @@ The command does not show the origin yet; the API gives it (see below).
 The package exports its engine, with its TypeScript types. The main functions:
 
 ```ts
-import { auditPaths, auditTheme, exitCode, isFailure, loadTheme, packageVersion, textReport } from 'vscode-theme-audit';
+import { auditInputs, auditPaths, auditTheme, exitCode, isFailure, loadTheme, packageVersion, textReport } from 'vscode-theme-audit';
 
-// What the command does: a report in the JSON format, the text report and the exit code
-const report = auditPaths(['path/to/my-extension'], { version: packageVersion(), strict: false });
+// What the command does: a report in the JSON format, the text report and the exit code. auditInputs takes
+// what the command takes, .vsix files and Open VSX ids included
+const report = await auditInputs(['path/to/my-extension', 'my-theme-1.2.3.vsix'], { version: packageVersion(), strict: false });
 console.log(textReport(report));
 process.exitCode = exitCode(report);
+
+// The same for theme files and extension folders only, without waiting
+const local = auditPaths(['path/to/my-extension'], { version: packageVersion() });
 
 // One theme, with its type: 'vs' (light), 'vs-dark', 'hc-black' or 'hc-light'
 const audit = auditTheme(loadTheme('themes/my-theme.json'), 'vs-dark');
@@ -252,6 +265,7 @@ Before version 1.0.0, the API can change in any release, as [Semantic Versioning
 - **Measurements and simulations, not people.** No calculation replaces testing with the people concerned. The color blindness simulations are models of dichromacy, which disagree with each other and approximate the vision of each person; that is why a pair must stay distinct with all of them.
 - **Thresholds are project rules.** WCAG sets the contrast minimums. The color distinction threshold (ΔE2000 of 7) and the minimums for selections are practical rules, not standards.
 - **JSON themes only.** TextMate theme files (`.tmTheme`), an older format, are not read yet. Product icon and file icon themes are not color themes and are not read.
+- **Open VSX, not the Visual Studio Marketplace.** Extensions are downloaded from Open VSX only (see [Usage](#usage)). A `.vsix` must take less than 200 MB once extracted, in 10,000 files at most: a limit against archives made to fill the disk; theme extensions take a few megabytes.
 - **Default settings of VS Code.** The terminal is measured with its default minimum contrast (`terminal.integrated.minimumContrastRatio`: 4.5), and the selected text of the terminal without the adjustments of xterm.js.
 - **Settings of the user are not read.** The audit measures the theme as published, without `workbench.colorCustomizations`, `editor.tokenColorCustomizations` or `editor.semanticTokenColorCustomizations`. The semantic token types and scopes added by extensions other than the built-in JavaScript and TypeScript ones are not read either.
 - **Defaults of one version of VS Code.** The defaults change from one version to the next, a few keys at a time. The version used is written in the report (`vscode`) and in the package (`VSCODE_SOURCE`).
@@ -267,7 +281,7 @@ Before version 1.0.0, the API can change in any release, as [Semantic Versioning
 | `npm install --save-dev vscode-theme-audit` | `npm uninstall vscode-theme-audit`, which also removes it from `package.json` and `package-lock.json`. Remove the scripts of `package.json` that call it |
 | From the sources | Delete the clone |
 
-To remove it from a CI, delete the steps that run it (or the whole workflow file, such as `.github/workflows/theme-audit.yml` in the example above), and the artifact step if you kept the JSON report. Nothing else is left: the command writes nothing on disk except the report you redirect, and it sends nothing over the network.
+To remove it from a CI, delete the steps that run it (or the whole workflow file, such as `.github/workflows/theme-audit.yml` in the example above), and the artifact step if you kept the JSON report. Nothing else is left: the command writes nothing on disk except the report you redirect, and a temporary folder for a `.vsix` or an Open VSX id, deleted before it ends. It uses the network only to download an `open-vsx:` id.
 
 ## Development
 

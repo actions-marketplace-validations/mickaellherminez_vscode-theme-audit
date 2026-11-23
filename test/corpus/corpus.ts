@@ -3,16 +3,16 @@
 // every license of these extensions allows it. Used by scripts/corpus.ts and by corpus.test.ts.
 
 import { createHash } from 'node:crypto';
-import { createWriteStream, existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
-import { dirname, isAbsolute, join, relative } from 'node:path';
-import { pipeline } from 'node:stream/promises';
-import { setTimeout as sleep } from 'node:timers/promises';
+import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { open } from 'yauzl';
-import type { Entry, ZipFile } from 'yauzl';
-
+import { fetchFile } from '../../src/open-vsx.ts';
 import type { Report } from '../../src/report.ts';
+
+// The download and the extraction are those of the package (src/open-vsx.ts and src/vsix.ts)
+export { fetchFile } from '../../src/open-vsx.ts';
+export { extractVsix } from '../../src/vsix.ts';
 
 const HERE = fileURLToPath(new URL('.', import.meta.url));
 export const LIST = join(HERE, 'extensions.json');
@@ -68,28 +68,6 @@ export function openVsxUrl(id: string, version: string, extension: 'vsix' | 'sha
   return `https://open-vsx.org/api/${parts.map(encodeURIComponent).join('/')}`;
 }
 
-const ATTEMPTS = 4;
-
-/** Downloads a file, trying again when the network or the server fails, but not when the file is missing. */
-export async function fetchFile(url: string): Promise<Buffer> {
-  for (let attempt = 1; ; attempt++) {
-    let failure: unknown;
-    let retry: boolean;
-    try {
-      const response = await fetch(url, { signal: AbortSignal.timeout(60_000) });
-      if (response.ok) return Buffer.from(await response.arrayBuffer());
-      failure = new Error(`${url}: HTTP ${String(response.status)}`);
-      retry = response.status >= 500 || response.status === 429;
-    } catch (error) {
-      // The network fails, or the server takes more than a minute
-      failure = error;
-      retry = true;
-    }
-    if (!retry || attempt === ATTEMPTS) throw failure;
-    await sleep(2000 * attempt);
-  }
-}
-
 /**
  * Puts the .vsix of an extension in the cache, unless it is there already, and checks its SHA-256. Returns
  * whether it was downloaded.
@@ -111,61 +89,6 @@ export function saveVsix(extension: { id: string; version: string }, data: Buffe
   mkdirSync(CACHE, { recursive: true });
   writeFileSync(`${file}.part`, data);
   renameSync(`${file}.part`, file);
-}
-
-function openZip(file: string): Promise<ZipFile> {
-  return new Promise((resolve, reject) => {
-    open(file, { lazyEntries: true }, (error, zip) => {
-      if (error) reject(error);
-      else resolve(zip);
-    });
-  });
-}
-
-function openEntry(zip: ZipFile, entry: Entry): Promise<NodeJS.ReadableStream> {
-  return new Promise((resolve, reject) => {
-    zip.openReadStream(entry, (error, stream) => {
-      if (error) reject(error);
-      else resolve(stream);
-    });
-  });
-}
-
-/**
- * Extracts a .vsix into a folder as VS Code installs it (extract() of src/vs/base/node/zip.ts, with the source
- * path 'extension'): with yauzl, the entries whose name starts with "extension", without this prefix. So
- * extension/package.json gives package.json, and extension.vsixmanifest gives .vsixmanifest, as in VS Code.
- */
-export async function extractVsix(file: string, target: string): Promise<void> {
-  const zip = await openZip(file);
-  try {
-    await new Promise<void>((resolve, reject) => {
-      zip.on('error', reject);
-      zip.on('end', resolve);
-      zip.on('entry', (entry: Entry) => {
-        extractEntry(zip, entry, target).then(() => { zip.readEntry(); }, reject);
-      });
-      zip.readEntry();
-    });
-  } finally {
-    zip.close();
-  }
-}
-
-async function extractEntry(zip: ZipFile, entry: Entry, target: string): Promise<void> {
-  if (!entry.fileName.startsWith('extension')) return;
-  const name = entry.fileName.slice('extension'.length);
-  const path = join(target, name);
-  const inside = relative(target, path);
-  // yauzl already refuses absolute names and '..'; VS Code checks the folder too
-  if (inside.startsWith('..') || isAbsolute(inside)) throw new Error(`${entry.fileName}: outside the extension folder`);
-  // The name of a folder ends with '/'
-  if (name.endsWith('/')) {
-    mkdirSync(path, { recursive: true });
-    return;
-  }
-  mkdirSync(dirname(path), { recursive: true });
-  await pipeline(await openEntry(zip, entry), createWriteStream(path));
 }
 
 /** What a report of the package gives for an extension, without the measures: themes and warnings. */

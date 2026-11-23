@@ -7,4 +7,4 @@ process.stdout.on('error', (error: NodeJS.ErrnoException) => {
   process.exit(process.exitCode);
 });
 
-process.exitCode = main(process.argv.slice(2));
+process.exitCode = await main(process.argv.slice(2));

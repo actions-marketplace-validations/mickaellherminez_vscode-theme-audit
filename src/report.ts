@@ -1,16 +1,20 @@
 // The report of the command: the audit of theme files and extension folders, as a versioned JSON document for CI
 // (schema/report-v1.schema.json) or as a text for people, and the exit code.
 
-import { existsSync, statSync } from 'node:fs';
-import { basename, dirname, relative, resolve, sep } from 'node:path';
+import { existsSync, mkdtempSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { basename, dirname, extname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 
 import { MIN_DELTA_E_2000, auditTheme, auditVariety, isFailure, varietyFailures } from './audit.ts';
 import type { Check, Distinction, ThemeAudit, Variety } from './audit.ts';
 import { extensionColors } from './colors.ts';
 import type { ColorRegistry } from './colors.ts';
+import { downloadOpenVsx, isOpenVsxInput, openVsxLabel, parseOpenVsxInput } from './open-vsx.ts';
+import type { Fetcher } from './open-vsx.ts';
 import { ThemeError, extensionThemes, loadTheme, readJsonc } from './theme.ts';
 import type { ThemeWarning, UiTheme } from './theme.ts';
 import { VSCODE_COLORS, VSCODE_SOURCE } from './vscode-colors.ts';
+import { extractVsix } from './vsix.ts';
 
 /** The version of the JSON format. It changes when a field is removed or changes meaning, not when one is added. */
 export const REPORT_FORMAT = 1;
@@ -30,7 +34,11 @@ export interface ThemeSummary {
 
 export interface ThemeReport {
   label: string;
-  /** The theme file, relative to the folder where the command runs. */
+  /**
+   * The theme file, relative to the folder where the command runs. In a .vsix, the path of the .vsix then the path
+   * inside it (`my-theme-1.2.3.vsix/extension/themes/dark.json`); for an extension of Open VSX, its id and version
+   * (`open-vsx:publisher.name@1.2.3/extension/themes/dark.json`).
+   */
   file: string;
   uiTheme: UiTheme;
   /** What VS Code accepts but the author probably did not mean, such as a color it shows in red. */
@@ -77,20 +85,32 @@ const TYPES: Readonly<Record<string, UiTheme>> = {
   hcLight: 'hc-light', 'hc-light': 'hc-light',
 };
 
-function display(file: string, cwd: string): string {
-  const path = relative(cwd, file) || basename(file);
-  return path.split(sep).join('/');
+/** How the report names a file: relative to the folder where the command runs, or inside a .vsix. */
+type Display = (file: string) => string;
+
+function relativeDisplay(cwd: string): Display {
+  return (file) => (relative(cwd, file) || basename(file)).split(sep).join('/');
 }
 
-function warningText(warning: ThemeWarning, cwd: string): string {
-  return warning.file ? `${display(warning.file, cwd)}: ${warning.message}` : warning.message;
+/** The files of an extracted .vsix, named by the .vsix or the Open VSX id, then their path inside it. */
+function vsixDisplay(root: string, prefix: string, outside: Display): Display {
+  return (file) => {
+    const inside = relative(root, file);
+    if (inside === '') return prefix;
+    if (inside.startsWith('..') || isAbsolute(inside)) return outside(file);
+    return `${prefix}/${inside.split(sep).join('/')}`;
+  };
+}
+
+function warningText(warning: ThemeWarning, show: Display): string {
+  return warning.file ? `${show(warning.file)}: ${warning.message}` : warning.message;
 }
 
 /** The themes of an extension folder, with the colors that the extension contributes. */
-function folderTargets(folder: string, cwd: string, warnings: string[]): Target[] {
+function folderTargets(folder: string, show: Display, warnings: string[]): Target[] {
   const { themes, warnings: manifestWarnings } = extensionThemes(folder);
   const { colors, warnings: colorWarnings } = extensionColors(folder);
-  warnings.push(...[...manifestWarnings, ...colorWarnings].map((w) => warningText(w, cwd)));
+  warnings.push(...[...manifestWarnings, ...colorWarnings].map((w) => warningText(w, show)));
   const registry = { ...VSCODE_COLORS, ...colors };
   return themes.map((theme) => ({ label: theme.label, file: theme.path, uiTheme: theme.uiTheme, registry, warnings: [] }));
 }
@@ -99,12 +119,12 @@ function folderTargets(folder: string, cwd: string, warnings: string[]): Target[
  * A theme file: its type and label come from the extension that contributes it, the nearest package.json above
  * it. Without one, the type comes from the `type` of the file, and VS Code would show it as dark otherwise.
  */
-function fileTarget(file: string, cwd: string, warnings: string[]): Target {
+function fileTarget(file: string, show: Display, warnings: string[]): Target {
   for (let folder = dirname(file); ; folder = dirname(folder)) {
     if (existsSync(resolve(folder, 'package.json'))) {
       try {
         const extensionWarnings: string[] = [];
-        const target = folderTargets(folder, cwd, extensionWarnings).find((t) => t.file === file);
+        const target = folderTargets(folder, show, extensionWarnings).find((t) => t.file === file);
         if (target) {
           warnings.push(...extensionWarnings);
           return target;
@@ -128,7 +148,7 @@ function fileTarget(file: string, cwd: string, warnings: string[]): Target {
   if (typeof name === 'string' && name) target.label = name;
   const uiTheme = typeof type === 'string' ? TYPES[type] : undefined;
   if (uiTheme) target.uiTheme = uiTheme;
-  else target.warnings.push(`${display(file, cwd)}: no extension declares this theme and its 'type' is missing or unknown: audited as dark (vs-dark), as VS Code shows it`);
+  else target.warnings.push(`${show(file)}: no extension declares this theme and its 'type' is missing or unknown: audited as dark (vs-dark), as VS Code shows it`);
   return target;
 }
 
@@ -143,24 +163,76 @@ function summarize(audit: ThemeAudit, strict: boolean): ThemeSummary {
   };
 }
 
+interface Entry {
+  /** An absolute path: a theme file, or an extension folder (an extracted .vsix too). */
+  path: string;
+  show: Display;
+}
+
 /**
  * The audit of theme files and extension folders. A folder that cannot be read as an extension with themes throws
- * a ThemeError; a theme that cannot be read is reported with its error.
+ * a ThemeError; a theme that cannot be read is reported with its error. A .vsix file or an Open VSX id needs
+ * auditInputs().
  */
 export function auditPaths(paths: readonly string[], options: { strict?: boolean; version: string; cwd?: string }): Report {
-  const strict = options.strict === true;
   const cwd = options.cwd ?? process.cwd();
+  const show = relativeDisplay(cwd);
+  return auditEntries(paths.map((path) => ({ path: resolve(cwd, path), show })), options);
+}
+
+/** Whether a path names a .vsix file. */
+function isVsixFile(path: string): boolean {
+  return extname(path).toLowerCase() === '.vsix' && existsSync(path) && statSync(path).isFile();
+}
+
+/**
+ * The audit of what the command takes: theme files, extension folders, .vsix files and Open VSX ids
+ * (`open-vsx:publisher.name[@version]`, downloaded with `fetcher`). Each .vsix is extracted into a temporary
+ * folder, deleted at the end. A .vsix or an Open VSX id that cannot be read throws a ThemeError, like a missing path.
+ */
+export async function auditInputs(inputs: readonly string[], options: { strict?: boolean; version: string; cwd?: string; fetcher?: Fetcher }): Promise<Report> {
+  const cwd = options.cwd ?? process.cwd();
+  const show = relativeDisplay(cwd);
+  const temp = mkdtempSync(join(tmpdir(), 'vscode-theme-audit-'));
+  try {
+    const entries: Entry[] = [];
+    for (const [index, input] of inputs.entries()) {
+      const folder = join(temp, String(index));
+      if (isOpenVsxInput(input)) {
+        const ref = parseOpenVsxInput(input);
+        const { version, data } = await downloadOpenVsx(ref, options.fetcher);
+        const file = `${folder}.vsix`;
+        writeFileSync(file, data);
+        await extractVsix(file, folder);
+        entries.push({ path: folder, show: vsixDisplay(folder, `${openVsxLabel(ref, version)}/extension`, show) });
+        continue;
+      }
+      const path = resolve(cwd, input);
+      if (isVsixFile(path)) {
+        await extractVsix(path, folder);
+        entries.push({ path: folder, show: vsixDisplay(folder, `${show(path)}/extension`, show) });
+        continue;
+      }
+      entries.push({ path, show });
+    }
+    return auditEntries(entries, options);
+  } finally {
+    rmSync(temp, { recursive: true, force: true });
+  }
+}
+
+function auditEntries(entries: readonly Entry[], options: { strict?: boolean; version: string }): Report {
+  const strict = options.strict === true;
   const warnings: string[] = [];
   const themes: ThemeReport[] = [];
   const variety: VarietyReport[] = [];
-  for (const path of paths) {
-    const absolute = resolve(cwd, path);
+  for (const { path: absolute, show } of entries) {
     if (!existsSync(absolute)) throw new ThemeError(absolute, 'no such file or folder');
     const isFolder = statSync(absolute).isDirectory();
-    const targets = isFolder ? folderTargets(absolute, cwd, warnings) : [fileTarget(absolute, cwd, warnings)];
+    const targets = isFolder ? folderTargets(absolute, show, warnings) : [fileTarget(absolute, show, warnings)];
     const loaded: { name: string; uiTheme: UiTheme; theme: ReturnType<typeof loadTheme> }[] = [];
     for (const target of targets) {
-      const entry: ThemeReport = { label: target.label, file: display(target.file, cwd), uiTheme: target.uiTheme, warnings: [...target.warnings] };
+      const entry: ThemeReport = { label: target.label, file: show(target.file), uiTheme: target.uiTheme, warnings: [...target.warnings] };
       themes.push(entry);
       let theme;
       try {
@@ -170,14 +242,14 @@ export function auditPaths(paths: readonly string[], options: { strict?: boolean
         entry.error = error.message.startsWith(`${target.file}: `) ? error.message.slice(target.file.length + 2) : error.message;
         continue;
       }
-      entry.warnings.push(...theme.warnings.map((w) => warningText(w, cwd)));
+      entry.warnings.push(...theme.warnings.map((w) => warningText(w, show)));
       const result = auditTheme(theme, target.uiTheme, { strict, registry: target.registry });
       Object.assign(entry, { summary: summarize(result, strict), ...result });
       loaded.push({ name: entry.file, uiTheme: target.uiTheme, theme });
     }
     if (strict && isFolder) {
       for (const result of auditVariety(loaded)) {
-        if (result.themes.length > 1) variety.push({ folder: display(absolute, cwd), ...result, failures: varietyFailures(result) });
+        if (result.themes.length > 1) variety.push({ folder: show(absolute), ...result, failures: varietyFailures(result) });
       }
     }
   }

@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+### Added
+- The command audits a packaged extension, `vscode-theme-audit my-theme-1.2.3.vsix`, and an extension of Open VSX, `vscode-theme-audit open-vsx:publisher.name[@version]`, downloaded through the public API of Open VSX and checked against the SHA-256 it publishes. A `.vsix` is extracted as VS Code installs it, into a temporary folder deleted at the end, with limits against broken or hostile archives (10,000 entries, 200 MB). The report names these themes by the `.vsix` or the id, then their path inside it. The API gives `auditInputs()`, `extractVsix()` and `downloadOpenVsx()`. The Visual Studio Marketplace is not supported: its download API is not documented ([#16](https://github.com/mickaellherminez/vscode-theme-audit/issues/16)).
+
+### Changed
+- `main()` is now asynchronous: it resolves to the exit code. yauzl, the zip library of VS Code, is now a dependency of the package ([#16](https://github.com/mickaellherminez/vscode-theme-audit/issues/16)).
+
 ## [0.1.2] - 2026-11-23
 
 ### Added
