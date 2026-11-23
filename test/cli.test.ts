@@ -43,6 +43,35 @@ function write(path: string, content: unknown): string {
 }
 
 describe('options', () => {
+  test('report formats preserve the JSON alias and the audit exit code', async () => {
+    const input = 'test/data/oracle-extension/themes/dark.json';
+    assert.deepEqual(await run([input, '--format', 'text']), await run([input]));
+    const legacy = await run([input, '--json']);
+    for (const flags of [['--format', 'json'], ['--format=json'], ['--json', '--format=json']]) {
+      assert.deepEqual(await run([input, ...flags]), legacy);
+    }
+    const markdown = await run([input, '--format', 'markdown']);
+    assert.equal(markdown.code, legacy.code);
+    assert.equal(markdown.err, '');
+    assert.match(markdown.out, /^# vscode-theme-audit/);
+    assert.deepEqual(await run([input, '--format=markdown']), markdown);
+    const passing = await run(['test/data/365', '--strict', '--format=markdown']);
+    assert.equal(passing.code, 0);
+    assert.match(passing.out, /0 failures/);
+  });
+
+  test('invalid or conflicting formats fail before reading any input', async () => {
+    for (const flags of [
+      ['--format'], ['--format='], ['--format', '--strict'], ['--format', 'html'],
+      ['--json', '--format', 'markdown'], ['--format=text', '--json'], ['--format=json', '--format=text'],
+    ]) {
+      const result = await run(['does-not-exist.json', ...flags]);
+      assert.equal(result.code, 2, flags.join(' '));
+      assert.equal(result.out, '');
+      assert.match(result.err, /^(?:--format needs|Unknown report format:|Conflicting report formats:)/);
+    }
+  });
+
   test('the version is the one of package.json', async () => {
     const manifest = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')) as { version: string };
     assert.equal(packageVersion(), manifest.version);

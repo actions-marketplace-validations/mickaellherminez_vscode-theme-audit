@@ -22,6 +22,7 @@ export { VSCODE_COLORS, VSCODE_SOURCE } from './vscode-colors.ts';
 export { DISTINCT_TOKENS, MIN_DELTA_E_2000, PRIORITY_KEYS, SEMANTIC_ROLES, TERMINAL_MINIMUM_CONTRAST, TOKEN_PROBES, auditTheme, auditVariety, hueFamily, isFailure, terminalColor, tokenColors, varietyFailures } from './audit.ts';
 export type { AuditOptions, Check, CheckStatus, Distinction, NamedTheme, PairDistance, ThemeAudit, Variety, VarietyMeasure } from './audit.ts';
 export { REPORT_FORMAT, auditInputs, auditPaths, exitCode, textReport } from './report.ts';
+export { markdownReport } from './markdown.ts';
 export { OPEN_VSX_API, OPEN_VSX_PREFIX, downloadOpenVsx, fetchFile, isOpenVsxInput, parseOpenVsxInput } from './open-vsx.ts';
 export type { Fetcher, OpenVsxRef } from './open-vsx.ts';
 export { VSIX_LIMITS, extractVsix } from './vsix.ts';

@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 
+import { markdownReport } from './markdown.ts';
 import type { Fetcher } from './open-vsx.ts';
 import { auditInputs, exitCode, textReport } from './report.ts';
 import { ThemeError } from './theme.ts';
@@ -31,7 +32,10 @@ A theme is:
                                    (downloaded from open-vsx.org)
 
 Options:
-  --json         Print the report as JSON, for CI (format 1, described by
+  --format <text|json|markdown>
+                 Choose the report format (text by default). Markdown is
+                 for pull request comments and GitHub Actions job summaries
+  --json         Alias for --format json (format 1, described by
                  schema/report-v1.schema.json in the package)
   --config <file>
                  Use this configuration for every theme, instead of the
@@ -50,16 +54,27 @@ Exit codes:
   2  a theme cannot be read, or the command is misused
 `;
 
-const OPTIONS = new Set(['-h', '--help', '-v', '--version', '--json', '--strict']);
+const OPTIONS = new Set(['-h', '--help', '-v', '--version', '--strict']);
 
-/** The options and the inputs of the command line; `--config <file>` and `--config=<file>` take a value. */
-function parseArgs(args: readonly string[]): { flags: Set<string>; config?: string; inputs: string[]; error?: string } {
+type Format = 'text' | 'json' | 'markdown';
+
+/** Options with values accept both `--option value` and `--option=value`. */
+function parseArgs(args: readonly string[]): { flags: Set<string>; config?: string; format?: Format; inputs: string[]; error?: string } {
   const flags = new Set<string>();
   const inputs: string[] = [];
   let config: string | undefined;
+  let format: Format | undefined;
   for (let i = 0; i < args.length; i++) {
     const arg = args[i] ?? '';
-    if (arg === '--config' || arg.startsWith('--config=')) {
+    if (arg === '--json' || arg === '--format' || arg.startsWith('--format=')) {
+      const value = arg === '--json' ? 'json' : arg === '--format' ? args[++i] : arg.slice('--format='.length);
+      if (value === undefined || value === '' || (arg === '--format' && value.startsWith('-'))) {
+        return { flags, inputs, error: '--format needs text, json or markdown' };
+      }
+      if (value !== 'text' && value !== 'json' && value !== 'markdown') return { flags, inputs, error: `Unknown report format: ${value}` };
+      if (format !== undefined && format !== value) return { flags, inputs, error: `Conflicting report formats: ${format} and ${value}` };
+      format = value;
+    } else if (arg === '--config' || arg.startsWith('--config=')) {
       const value = arg === '--config' ? args[++i] : arg.slice('--config='.length);
       if (value === undefined || value === '' || (arg === '--config' && value.startsWith('-'))) return { flags, inputs, error: '--config needs a file' };
       if (config !== undefined) return { flags, inputs, error: '--config is given twice' };
@@ -71,7 +86,7 @@ function parseArgs(args: readonly string[]): { flags: Set<string>; config?: stri
       inputs.push(arg);
     }
   }
-  return config === undefined ? { flags, inputs } : { flags, config, inputs };
+  return { flags, inputs, ...(config === undefined ? {} : { config }), ...(format === undefined ? {} : { format }) };
 }
 
 /** Version of the package, read from its package.json (one folder above src/ and dist/). */
@@ -93,7 +108,7 @@ export async function main(args: readonly string[], output: Output = consoleOutp
     output.out(`${packageVersion()}\n`);
     return 0;
   }
-  const { flags, config, inputs, error } = parseArgs(args);
+  const { flags, config, format = 'text', inputs, error } = parseArgs(args);
   if (error !== undefined) {
     output.err(`${error}\n\n${HELP}`);
     return 2;
@@ -112,6 +127,6 @@ export async function main(args: readonly string[], output: Output = consoleOutp
     output.err(`vscode-theme-audit: ${error.message}\n`);
     return 2;
   }
-  output.out(flags.has('--json') ? JSON.stringify(report, null, 2) + '\n' : textReport(report));
+  output.out(format === 'json' ? JSON.stringify(report, null, 2) + '\n' : format === 'markdown' ? markdownReport(report) : textReport(report));
   return exitCode(report);
 }

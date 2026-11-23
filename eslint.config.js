@@ -3,7 +3,7 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   // test/data/inspect/: code samples that VS Code colors (scripts/vscode-inspect.ts), not code of the package
-  { ignores: ['dist/', 'node_modules/', '.cache/', 'test/data/inspect/'] },
+  { ignores: ['dist/', 'action/dist/', 'node_modules/', '.cache/', 'test/data/inspect/'] },
   js.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
   {

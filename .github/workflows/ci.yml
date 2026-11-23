@@ -50,6 +50,12 @@ jobs:
       - name: The package contains what it should, under its size limit
         run: node --test "test/package/*.test.ts"
 
+      - name: The shipped action and its licenses match the sources
+        run: npm run check:action
+
+      - name: The shipped action runs without npm dependencies
+        run: npm run test:action
+
   corpus:
     # 20 theme extensions of Open VSX at fixed versions (test/corpus/extensions.json).
     # Their .vsix files are cached, and downloaded again only when the list changes.

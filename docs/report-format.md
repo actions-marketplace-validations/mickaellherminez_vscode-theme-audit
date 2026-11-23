@@ -2,6 +2,8 @@
 
 `vscode-theme-audit --json` prints one JSON document on the standard output. It is described by the schema [`schema/report-v1.schema.json`](../schema/report-v1.schema.json) (JSON Schema 2020-12), published in the package (`node_modules/vscode-theme-audit/schema/report-v1.schema.json` once installed). The API gives the same object: `auditInputs()`, or `auditPaths()` for theme files and folders (see the [README](../README.md#api)).
 
+`--format json` and `--format=json` select the same document; `--json` remains an alias. Text is the default, and `--format markdown` produces a [bounded report for PR comments and job summaries](../README.md#the-markdown-report). These are renderers of the same audit and have the same exit codes. Contradictory format choices fail with code 2. To return to text, remove the format option or use `--format text`. The Markdown renderer does not change JSON format 1.
+
 ## Versions
 
 `format` is the version of this format. **Format 1 can gain fields**: read the fields you need and ignore the others. A field removed, renamed or changing meaning gives format 2, with a new schema file, announced in the [CHANGELOG](../CHANGELOG.md). The schema of format 1 refuses unknown fields, so a report of a later 1.x release can fail the schema of an earlier one: validate a report with the schema of the package that wrote it.

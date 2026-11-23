@@ -1,0 +1,9 @@
+{
+  "ignore": [
+    {
+      "check": "Line numbers",
+      "theme": "Oracle Dark",
+      "reason": "This test fixture exercises a justified exception in the action report."
+    }
+  ]
+}

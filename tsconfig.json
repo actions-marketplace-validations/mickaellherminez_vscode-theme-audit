@@ -19,7 +19,7 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["src", "test", "scripts"],
+  "include": ["src", "test", "scripts", "action/*.ts"],
   // Code samples that VS Code colors (scripts/vscode-inspect.ts), not code of the package
   "exclude": ["test/data/inspect"]
 }
