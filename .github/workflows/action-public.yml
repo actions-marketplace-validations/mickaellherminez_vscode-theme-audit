@@ -1,0 +1,70 @@
+# Downloads a reviewed action commit as a consumer would. The local-action workflow covers all three systems;
+# this focused smoke test keeps only theme fixtures and verification code in its Ubuntu workspace.
+name: Public action
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  public-action:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /test/data/365/
+            /test/data/oracle-extension/
+            /test/data/action/
+            /scripts/action-ci.ts
+
+      - name: The workspace contains no local action or engine
+        run: |
+          node -e "const assert = require('node:assert/strict'); const { existsSync } = require('node:fs'); for (const path of ['action.yml', 'action.yaml', 'action', 'src', 'node_modules', 'package.json']) assert.equal(existsSync(path), false, path + ' must not be checked out'); for (const path of ['test/data/365/package.json', 'test/data/oracle-extension/themes/dark.json', 'test/data/action/config.json', 'scripts/action-ci.ts']) assert.ok(existsSync(path), path + ' must be checked out');"
+
+      - name: Passing themes, in strict mode
+        id: passing
+        uses: mickaellherminez/vscode-theme-audit@a37f9fc4e1e5743c16ce569eaa657ad3fb7466ce
+        with:
+          path: test/data/365
+          strict: 'true'
+
+      - name: A failure with a visible exception
+        id: failing
+        continue-on-error: true
+        uses: mickaellherminez/vscode-theme-audit@a37f9fc4e1e5743c16ce569eaa657ad3fb7466ce
+        with:
+          path: test/data/oracle-extension/themes/dark.json
+          config: test/data/action/config.json
+
+      - name: A configuration error
+        id: error
+        continue-on-error: true
+        uses: mickaellherminez/vscode-theme-audit@a37f9fc4e1e5743c16ce569eaa657ad3fb7466ce
+        with:
+          path: test/data/365
+          config: missing-action-config.json
+
+      # Node.js 24 is for the assertion script; the downloaded action provides its own runtime.
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Check the results and the saved reports
+        env:
+          PASS_OUTCOME: ${{ steps.passing.outcome }}
+          PASS_CODE: ${{ steps.passing.outputs.exit-code }}
+          PASS_REPORT: ${{ steps.passing.outputs.report-path }}
+          FAIL_OUTCOME: ${{ steps.failing.outcome }}
+          FAIL_CODE: ${{ steps.failing.outputs.exit-code }}
+          FAIL_REPORT: ${{ steps.failing.outputs.report-path }}
+          ERROR_OUTCOME: ${{ steps.error.outcome }}
+          ERROR_CODE: ${{ steps.error.outputs.exit-code }}
+          ERROR_REPORT: ${{ steps.error.outputs.report-path }}
+        run: node scripts/action-ci.ts

@@ -168,7 +168,7 @@ The report is limited to 60,000 UTF-8 bytes, so it fits a PR comment and a job s
 
 The action in this repository embeds the audit engine and its dependencies. After checkout it audits the theme extension, writes its Markdown report in the job summary, and fails the step on audit failures or errors. It uses the GitHub Actions Node.js 24 runtime; no npm installation or `setup-node` step is needed for the action. [Full inputs, outputs, demonstration, versioning and removal](docs/github-action.md).
 
-The following workflow is a template: replace `<full-commit-sha>` with the **40-character SHA of a reviewed commit that contains the action** before running it. A SHA for the first released action will be available with 0.2.0; npm 0.1.2 and the existing 0.1 tags do not contain it.
+The following workflow pins the reviewed **development commit** `a37f9fc4e1e5743c16ce569eaa657ad3fb7466ce`, which contains the unreleased action. It is not an npm release. When 0.2.0 is released, choose its reviewed full commit SHA to use that release; npm 0.1.2 and the existing 0.1 tags do not contain the action.
 
 ```yaml
 name: Theme audit
@@ -180,7 +180,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: mickaellherminez/vscode-theme-audit@<full-commit-sha>
+      - uses: mickaellherminez/vscode-theme-audit@a37f9fc4e1e5743c16ce569eaa657ad3fb7466ce
         with:
           path: '.'
           # Optional; false by default
@@ -190,6 +190,8 @@ jobs:
 ```
 
 `path` accepts one theme file, extension folder, `.vsix` or Open VSX id as a literal value. An Open VSX id downloads the extension; local inputs need no network access from the audit engine. `strict` is `true` or `false`; `config` is a configuration file relative to the checked-out workspace. The action needs no secret and does not post comments or change the theme files. Delete its step to remove it, or its workflow if the workflow serves only this audit.
+
+The [public action test](.github/workflows/action-public.yml) uses that exact SHA from a checkout containing only test themes, their configuration and the report assertions. It checks public action download separately from the [three-system demonstration](.github/workflows/action.yml), which tests the current commit's action.
 
 ### The published command
 

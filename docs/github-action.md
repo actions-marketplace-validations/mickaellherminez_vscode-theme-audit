@@ -4,7 +4,7 @@ The action is part of the unreleased 0.2.0 work. The current npm release, 0.1.2,
 
 ## Run it
 
-See the [workflow template in the README](../README.md#github-action). Replace its `<full-commit-sha>` placeholder with a reviewed commit containing the action. Use a full SHA to keep the engine and its checks fixed; changing that SHA is an explicit update. The action does not select npm `latest` and has no separate engine-version input.
+See the [workflow in the README](../README.md#github-action). It pins reviewed development commit `a37f9fc4e1e5743c16ce569eaa657ad3fb7466ce`, containing the unreleased action. This commit is not an npm release. Use the reviewed full SHA of the intended release when it is available. A full SHA keeps the engine and its checks fixed; changing it is an explicit update. The action does not select npm `latest` and has no separate engine-version input.
 
 Check out the theme repository first. `path` is relative to that workspace (`GITHUB_WORKSPACE`), including when the action itself comes from another repository. No npm install or `setup-node` step is required. A self-hosted runner must support Node.js 24 actions; use a current runner release as described in the [GitHub metadata reference](https://docs.github.com/en/actions/reference/workflows-and-actions/metadata-syntax#runsusing).
 
@@ -57,7 +57,11 @@ The demonstration lives in this repository: [`.github/workflows/action.yml`](../
 
 A following step asserts the expected step outcomes, exit codes and saved report contents. The report also appears in the job summary; inspect its actual GitHub rendering when the workflow has run. This is a demonstration and integration test in the action's own repository, not a claim that another repository has adopted it.
 
-The normal CI separately checks the source tests, that the bundle and licenses match a fresh build, and that the bundle runs from an isolated folder without `node_modules` or this repository's sources. Before the first Marketplace listing, also run an invocation of `mickaellherminez/vscode-theme-audit@<full-commit-sha>` from this same repository and inspect its summary. That public-download check needs a pushed commit containing the action; it is separate from the local-path test and creates no new repository. Keep a workflow using that exact SHA as the record of the check.
+The normal CI separately checks the source tests, that the bundle and licenses match a fresh build, and that the bundle runs from an isolated folder without `node_modules` or this repository's sources.
+
+The [public action test](../.github/workflows/action-public.yml) calls `mickaellherminez/vscode-theme-audit@a37f9fc4e1e5743c16ce569eaa657ad3fb7466ce` for the same three cases on Ubuntu. Its non-cone sparse checkout contains only the fixtures, their configuration and the assertion script. A guard checks that the local action metadata, bundle, engine sources and `node_modules` are absent: GitHub must download the action at the public SHA. No new repository is created. This targeted download check complements the three-system local-action demonstration above. Inspect its actual GitHub summary after the workflow runs; adding this file alone does not establish that the run passed.
+
+The public test records one fixed revision, while the local-action demonstration always tests the candidate commit. To check another public version, first push and review its action commit, then update all three `uses` references in the public test and the matching SHA references in the README, this guide and CONTRIBUTING. Run the workflow and inspect its summary. Restore the previous references to go back. Before a Marketplace listing, verify that these references and the resulting check identify the intended action version.
 
 ## Publication on the Marketplace
 
@@ -71,4 +75,4 @@ To update, replace the action SHA with the reviewed SHA of the intended release,
 
 To remove the audit from a consumer repository, delete its action step and any artifact step, or the whole workflow if it serves only this audit. No npm package was installed by the action. Reports in `RUNNER_TEMP` last for the job; GitHub manages hosted-runner cleanup and a self-hosted runner's owner manages its cleanup. Previous job summaries and uploaded artifacts remain until their workflow runs or artifacts are removed under the repository's retention settings.
 
-To remove the demonstration from this repository, remove `.github/workflows/action.yml`; the normal engine checks remain. To remove a Marketplace listing, edit each listed release and clear its Marketplace publication checkbox as described in GitHub's documentation. Removing a listing does not invalidate the code at a SHA already used by a workflow.
+To remove the demonstrations from this repository, remove `.github/workflows/action.yml` and `.github/workflows/action-public.yml`; the normal engine checks remain. To remove a Marketplace listing, edit each listed release and clear its Marketplace publication checkbox as described in GitHub's documentation. Removing a listing does not invalidate the code at a SHA already used by a workflow.
