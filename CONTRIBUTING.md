@@ -214,7 +214,9 @@ To release a version:
    ```
 
 3. **The workflow** then runs, in the `npm` environment of the repository. It checks that the tag is on `main` and names the version of `package.json`, and that npm is recent enough for trusted publishing (11.5.1 or later). It then runs `npm run check` and publishes to npm. Last, it creates the GitHub release, whose notes are the section of the CHANGELOG for that version (`scripts/release-notes.ts`). A failed step stops the release before anything is published, except the GitHub release, which comes last: if it fails, run its command again from the workflow file.
-4. **Check** the npm page of the version, which shows its provenance, and the published package: `npx vscode-theme-audit@0.1.0 --version`.
+4. **The published package** is then checked by [`published.yml`](.github/workflows/published.yml), which the release workflow calls: on Linux, Windows and macOS, with Node.js 22 and 24, it waits until npm serves the version, then runs `npx vscode-theme-audit@<version> --version` in an empty folder and audits the 48 themes of `test/data/365`, which must pass every check, in text and in JSON. Check also the npm page of the version, which shows its provenance.
+
+The same check runs by hand on any published version, `latest` by default: `gh workflow run published.yml -f version=0.1.0`, or **Actions**, **Published package**, **Run workflow**. A pull request that changes `published.yml` runs it on the latest version.
 
 Only release versions (`v1.2.3`) start the workflow: a prerelease would need its own npm dist-tag, which the workflow does not set.
 
