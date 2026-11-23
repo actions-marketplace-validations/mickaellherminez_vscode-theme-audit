@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-11-23
+
 ### Added
 - A check of the published package: after each release, `.github/workflows/published.yml` installs the new version from npm with npx, in an empty folder, on Linux, Windows and macOS with Node.js 22 and 24, and audits the 48 themes of 365 Day & Night with it. It also runs by hand on any version. The README shows the npm version badge ([#15](https://github.com/mickaellherminez/vscode-theme-audit/issues/15)).
 - The CI runs the checks and the corpus test on Linux, Windows and macOS, with Node.js 22 and 24. `npm run test:package` checks the content of the package that npm publishes (the compiled code, the JSON schema, README, LICENSE, CHANGELOG and THIRD-PARTY-NOTICES) and its size: 120 kB at most, 500 kB unpacked; `npm run check` runs it too. The package now contains the CHANGELOG ([#14](https://github.com/mickaellherminez/vscode-theme-audit/issues/14)).
