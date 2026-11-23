@@ -63,15 +63,22 @@ describe('auditing a .vsix', () => {
   });
 
   test('the temporary folder is deleted, and a broken .vsix stops the audit like a missing path', async () => {
-    const before = new Set(readTemp());
-    await auditInputs(['night-1.0.0.vsix'], { version: 'test', cwd: temp });
-    assert.deepEqual(readTemp().filter((name) => !before.has(name)), []);
-    await assert.rejects(auditInputs(['broken.vsix'], { version: 'test', cwd: temp }), ThemeError);
-    assert.deepEqual(readTemp().filter((name) => !before.has(name)), []);
+    // A temporary folder of its own: the other test files run at the same time, and use the system one too.
+    // os.tmpdir() reads these variables at each call, and each test file runs in a process of its own
+    const own = mkdtempSync(join(temp, 'own-temp-'));
+    const saved = { TMPDIR: process.env.TMPDIR, TMP: process.env.TMP, TEMP: process.env.TEMP };
+    Object.assign(process.env, { TMPDIR: own, TMP: own, TEMP: own });
+    try {
+      assert.equal(tmpdir(), own);
+      await auditInputs(['night-1.0.0.vsix'], { version: 'test', cwd: temp });
+      assert.deepEqual(readdirSync(own), []);
+      await assert.rejects(auditInputs(['broken.vsix'], { version: 'test', cwd: temp }), ThemeError);
+      assert.deepEqual(readdirSync(own), []);
+    } finally {
+      for (const [key, value] of Object.entries(saved)) {
+        if (value === undefined) Reflect.deleteProperty(process.env, key);
+        else process.env[key] = value;
+      }
+    }
   });
 });
-
-/** The temporary folders of the package, other than the one of these tests. */
-function readTemp(): string[] {
-  return readdirSync(tmpdir()).filter((name) => name.startsWith('vscode-theme-audit-') && join(tmpdir(), name) !== temp);
-}

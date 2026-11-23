@@ -8,6 +8,8 @@ import { basename, dirname, extname, isAbsolute, join, relative, resolve, sep } 
 import { MIN_DELTA_E_2000, auditTheme, auditVariety, isFailure, varietyFailures } from './audit.ts';
 import type { Check, Distinction, ThemeAudit, Variety } from './audit.ts';
 import { extensionColors } from './colors.ts';
+import { DEFAULT_THRESHOLDS, applyConfig, exceptionName, findConfig, loadConfig, loweredThresholds } from './config.ts';
+import type { Config, ExceptionUse, Thresholds } from './config.ts';
 import type { ColorRegistry } from './colors.ts';
 import { downloadOpenVsx, isOpenVsxInput, openVsxLabel, parseOpenVsxInput } from './open-vsx.ts';
 import type { Fetcher } from './open-vsx.ts';
@@ -30,6 +32,8 @@ export interface ThemeSummary {
   pairs: number;
   /** Pairs of colors that a vision confuses (CIEDE2000 under the minimum). */
   confused: number;
+  /** Checks and pairs that would fail, but that the configuration ignores, each with its reason. */
+  ignored: number;
 }
 
 export interface ThemeReport {
@@ -43,6 +47,10 @@ export interface ThemeReport {
   uiTheme: UiTheme;
   /** What VS Code accepts but the author probably did not mean, such as a color it shows in red. */
   warnings: string[];
+  /** The configuration file that applies to this theme, if any. */
+  config?: string;
+  /** The thresholds of that configuration, when they differ from the defaults. */
+  thresholds?: Thresholds;
   /** Why the theme cannot be read: VS Code would not load it, or the package cannot read it yet. */
   error?: string;
   summary?: ThemeSummary;
@@ -159,7 +167,9 @@ function summarize(audit: ThemeAudit, strict: boolean): ThemeSummary {
     missing: strict ? 0 : audit.checks.filter((c) => c.status === 'missing').length,
     information: audit.checks.filter((c) => c.information === true && c.status !== 'pass').length,
     pairs: audit.distinctions.length,
-    confused: audit.distinctions.filter((d) => d.status === 'fail').length,
+    confused: audit.distinctions.filter((d) => isFailure(d)).length,
+    ignored: [...audit.checks, ...audit.distinctions]
+      .filter((c) => c.ignored !== undefined && (c.status === 'fail' || (strict && c.status === 'missing'))).length,
   };
 }
 
@@ -169,15 +179,29 @@ interface Entry {
   show: Display;
 }
 
+export interface AuditPathOptions {
+  /** The rules of 365 Day & Night (--strict). */
+  strict?: boolean;
+  /** The version of the package, written in the report. */
+  version: string;
+  /** The folder that paths are relative to (the current folder by default). */
+  cwd?: string;
+  /**
+   * A configuration file for every input (--config). Without it, each extension folder uses its own
+   * .vscode-theme-audit.json, if it has one.
+   */
+  config?: string;
+}
+
 /**
  * The audit of theme files and extension folders. A folder that cannot be read as an extension with themes throws
  * a ThemeError; a theme that cannot be read is reported with its error. A .vsix file or an Open VSX id needs
  * auditInputs().
  */
-export function auditPaths(paths: readonly string[], options: { strict?: boolean; version: string; cwd?: string }): Report {
+export function auditPaths(paths: readonly string[], options: AuditPathOptions): Report {
   const cwd = options.cwd ?? process.cwd();
   const show = relativeDisplay(cwd);
-  return auditEntries(paths.map((path) => ({ path: resolve(cwd, path), show })), options);
+  return auditEntries(paths.map((path) => ({ path: resolve(cwd, path), show })), options, cwd);
 }
 
 /** Whether a path names a .vsix file. */
@@ -190,7 +214,7 @@ function isVsixFile(path: string): boolean {
  * (`open-vsx:publisher.name[@version]`, downloaded with `fetcher`). Each .vsix is extracted into a temporary
  * folder, deleted at the end. A .vsix or an Open VSX id that cannot be read throws a ThemeError, like a missing path.
  */
-export async function auditInputs(inputs: readonly string[], options: { strict?: boolean; version: string; cwd?: string; fetcher?: Fetcher }): Promise<Report> {
+export async function auditInputs(inputs: readonly string[], options: AuditPathOptions & { fetcher?: Fetcher }): Promise<Report> {
   const cwd = options.cwd ?? process.cwd();
   const show = relativeDisplay(cwd);
   const temp = mkdtempSync(join(tmpdir(), 'vscode-theme-audit-'));
@@ -215,20 +239,38 @@ export async function auditInputs(inputs: readonly string[], options: { strict?:
       }
       entries.push({ path, show });
     }
-    return auditEntries(entries, options);
+    return auditEntries(entries, options, cwd);
   } finally {
     rmSync(temp, { recursive: true, force: true });
   }
 }
 
-function auditEntries(entries: readonly Entry[], options: { strict?: boolean; version: string }): Report {
+function auditEntries(entries: readonly Entry[], options: AuditPathOptions, cwd: string): Report {
   const strict = options.strict === true;
   const warnings: string[] = [];
   const themes: ThemeReport[] = [];
   const variety: VarietyReport[] = [];
+  // Each configuration is read once, and reports the exceptions that named nothing once, after every input
+  const configs = new Map<string, { config: Config; show: Display; use: ExceptionUse }>();
+  const given = options.config === undefined ? undefined : resolve(cwd, options.config);
+  if (given !== undefined && !existsSync(given)) throw new ThemeError(given, 'no such configuration file');
+  const configFor = (path: string, isFolder: boolean, show: Display) => {
+    const file = given ?? findConfig(path, isFolder);
+    if (file === undefined) return undefined;
+    let found = configs.get(file);
+    if (!found) {
+      const config = loadConfig(file);
+      const name = given === undefined ? show(file) : relativeDisplay(cwd)(file);
+      found = { config, show: given === undefined ? show : relativeDisplay(cwd), use: { used: new Set(), needed: new Set() } };
+      configs.set(file, found);
+      warnings.push(...loweredThresholds(config).map((warning) => `${name}: ${warning}`));
+    }
+    return found;
+  };
   for (const { path: absolute, show } of entries) {
     if (!existsSync(absolute)) throw new ThemeError(absolute, 'no such file or folder');
     const isFolder = statSync(absolute).isDirectory();
+    const configuration = configFor(absolute, isFolder, show);
     const targets = isFolder ? folderTargets(absolute, show, warnings) : [fileTarget(absolute, show, warnings)];
     const loaded: { name: string; uiTheme: UiTheme; theme: ReturnType<typeof loadTheme> }[] = [];
     for (const target of targets) {
@@ -243,7 +285,13 @@ function auditEntries(entries: readonly Entry[], options: { strict?: boolean; ve
         continue;
       }
       entry.warnings.push(...theme.warnings.map((w) => warningText(w, show)));
-      const result = auditTheme(theme, target.uiTheme, { strict, registry: target.registry });
+      let result = auditTheme(theme, target.uiTheme, { strict, registry: target.registry });
+      if (configuration) {
+        const { config } = configuration;
+        result = applyConfig(result, config, target.label, configuration.use, strict);
+        entry.config = configuration.show(config.file);
+        if (JSON.stringify(config.thresholds) !== JSON.stringify(DEFAULT_THRESHOLDS)) entry.thresholds = config.thresholds;
+      }
       Object.assign(entry, { summary: summarize(result, strict), ...result });
       loaded.push({ name: entry.file, uiTheme: target.uiTheme, theme });
     }
@@ -251,6 +299,13 @@ function auditEntries(entries: readonly Entry[], options: { strict?: boolean; ve
       for (const result of auditVariety(loaded)) {
         if (result.themes.length > 1) variety.push({ folder: show(absolute), ...result, failures: varietyFailures(result) });
       }
+    }
+  }
+  // Exceptions that no longer keep a failure out: a stale exception would hide the next regression
+  for (const { config, show, use } of configs.values()) {
+    for (const exception of config.ignore) {
+      if (!use.used.has(exception)) warnings.push(`${show(config.file)}: ${exceptionName(exception)} matches nothing: fix its name or remove it`);
+      else if (!use.needed.has(exception)) warnings.push(`${show(config.file)}: ${exceptionName(exception)} passes: the exception can be removed`);
     }
   }
   const failing = themes.filter((t) => t.summary && (t.summary.failed > 0 || t.summary.confused > 0));
@@ -298,34 +353,50 @@ export function textReport(report: Report): string {
     }
     const { summary, checks = [], distinctions = [], achromatopsia = [] } = theme;
     if (!summary) continue;
+    const minimumDeltaE2000 = theme.thresholds?.deltaE2000 ?? report.minimumDeltaE2000;
+    if (theme.config !== undefined) {
+      const t = theme.thresholds;
+      lines.push(`  configuration: ${theme.config}${t ? ` (thresholds: text ${String(t.text)}, enhanced text ${String(t.enhancedText)}, non-text ${String(t.nonText)}, ΔE2000 ${String(t.deltaE2000)})` : ''}`);
+    }
+    // A check that the configuration ignores is shown with its reason, where it would have failed
+    const wouldFail = (check: Check) => check.information === undefined && (check.status === 'fail' || (report.strict && check.status === 'missing'));
     for (const check of checks) {
-      if (!isFailure(check, report.strict)) continue;
+      if (!wouldFail(check)) continue;
+      const tag = check.ignored === undefined ? '' : `  (ignored: ${check.ignored})`;
+      const kind = check.ignored === undefined ? (check.status === 'missing' ? 'MISSING ' : 'FAIL    ') : 'IGNORED ';
       if (check.status === 'missing') {
-        lines.push(`  MISSING  ${check.label}`);
+        lines.push(`  ${kind} ${check.label}${tag}`);
       } else if (typeof check.minimum === 'string') {
-        lines.push(`  FAIL     ${check.label}: expected ${check.minimum}`);
+        lines.push(`  ${kind} ${check.label}: expected ${check.minimum}${tag}`);
       } else {
         const colors = check.colors ? `${check.colors[0]} on ${check.colors[1]}  ` : '';
-        lines.push(`  FAIL     ${check.label}: ${colors}${number(check.value, 2)} < ${String(check.minimum)}`);
+        lines.push(`  ${kind} ${check.label}: ${colors}${number(check.value, 2)} < ${String(check.minimum)}${tag}`);
       }
     }
-    // One line per pair of colors, with each vision that confuses it
+    // One line per pair of colors, with each vision that confuses it; the ignored ones apart, with their reason
     const confused = new Map<string, Distinction[]>();
     for (const pair of distinctions) {
       if (pair.status !== 'fail') continue;
-      const key = pair.pair.join(' / ');
+      const key = `${pair.ignored === undefined ? '' : 'ignored\n'}${pair.pair.join(' / ')}`;
       confused.set(key, [...(confused.get(key) ?? []), pair]);
     }
-    for (const [key, pairs] of confused) {
+    for (const pairs of confused.values()) {
+      const [first] = pairs;
+      if (!first) continue;
       const views = pairs.map((p) => `${p.view} ${number(p.deltaE2000, 1)}${p.model ? ` (${p.model})` : ''}`).join(', ');
-      lines.push(`  CONFUSED ${key} (${pairs[0]?.colors.join(' / ') ?? ''}): ΔE2000 under ${String(report.minimumDeltaE2000)}: ${views}`);
+      const reasons = [...new Set(pairs.map((p) => p.ignored).filter((r) => r !== undefined))];
+      const kind = first.ignored === undefined ? 'CONFUSED' : 'IGNORED ';
+      lines.push(`  ${kind} ${first.pair.join(' / ')} (${first.colors.join(' / ')}): ΔE2000 under ${String(minimumDeltaE2000)}: ${views}${reasons.length > 0 ? `  (ignored: ${reasons.join('; ')})` : ''}`);
     }
-    const parts = [`${String(summary.checks - summary.failed)} of ${String(summary.checks)} checks pass`,
-      `${String(summary.pairs - summary.confused)} of ${String(summary.pairs)} pairs stay distinct`];
+    const ignoredChecks = checks.filter((c) => c.ignored !== undefined && wouldFail(c)).length;
+    const ignoredPairs = summary.ignored - ignoredChecks;
+    const parts = [`${String(summary.checks - summary.failed - ignoredChecks)} of ${String(summary.checks)} checks pass`,
+      `${String(summary.pairs - summary.confused - ignoredPairs)} of ${String(summary.pairs)} pairs stay distinct`];
+    if (summary.ignored > 0) parts.push(`${String(summary.ignored)} ignored by the configuration`);
     if (summary.missing > 0) parts.push(`${String(summary.missing)} colors that VS Code does not show (information)`);
     if (summary.information > 0) parts.push(`${String(summary.information)} styles of WCAG 1.4.1 missing (information)`);
-    const grays = achromatopsia.filter((p) => p.deltaE2000 < report.minimumDeltaE2000).length;
-    parts.push(`achromatopsia: ${String(grays)} of ${String(achromatopsia.length)} pairs under ${String(report.minimumDeltaE2000)} (information)`);
+    const grays = achromatopsia.filter((p) => p.deltaE2000 < minimumDeltaE2000).length;
+    parts.push(`achromatopsia: ${String(grays)} of ${String(achromatopsia.length)} pairs under ${String(minimumDeltaE2000)} (information)`);
     lines.push(`  ${parts.join('; ')}`);
   }
   for (const result of report.variety) {

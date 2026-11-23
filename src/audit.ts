@@ -29,6 +29,8 @@ export interface Check {
   information?: true;
   /** The two colors measured, as shown: opaque, after composition on what is under them ('#RRGGBB'). */
   colors?: [string, string];
+  /** Ignored by the configuration, with its reason: never a failure, still reported. */
+  ignored?: string;
 }
 
 /** Two colors that must stay distinct, and their closest simulation for one vision. */
@@ -44,6 +46,8 @@ export interface Distinction {
   /** The two colors, as the theme or VS Code gives them. */
   colors: [string, string];
   status: 'pass' | 'fail';
+  /** Ignored by the configuration, with its reason: never a failure, still reported. */
+  ignored?: string;
 }
 
 export interface ThemeAudit {
@@ -596,9 +600,12 @@ function distinctions(theme: Theme, uiTheme: UiTheme, strict: boolean, registry:
   return result;
 }
 
-/** Whether a check counts as a failure: a failed measure, or a missing color in strict mode; never information. */
+/**
+ * Whether a check counts as a failure: a failed measure, or a missing color in strict mode; never information, and
+ * never a check that the configuration ignores.
+ */
 export function isFailure(check: Check | Distinction, strict = false): boolean {
-  if ('information' in check) return false;
+  if ('information' in check || check.ignored !== undefined) return false;
   return check.status === 'fail' || (strict && check.status === 'missing');
 }
 

@@ -79,6 +79,7 @@ Each argument is a theme file, an extension folder, a `.vsix` file or an Open VS
 | --- | --- |
 | `--json` | Prints the report as JSON instead of text: format 1, described by [`schema/report-v1.schema.json`](schema/report-v1.schema.json), which the package contains. It gives every check, not only the failures. See [The JSON report](#the-json-report) |
 | `--strict` | Applies the rules of 365 Day & Night (see [Strict mode](#strict-mode)) |
+| `--config <file>` | Uses this configuration for every theme, instead of the `.vscode-theme-audit.json` of each extension folder (see [Configuration](#configuration)) |
 | `-h`, `--help` | Shows the help |
 | `-v`, `--version` | Shows the version |
 
@@ -113,6 +114,8 @@ Oracle Dark (vs-dark): test/data/oracle-extension/themes/dark.json
 | `FAIL     <check>: <text> on <background>  <ratio> < <minimum>` | A contrast under its minimum. The two colors are those that VS Code shows: opaque, after a transparent color is composed on what is under it. For a style of WCAG 1.4.1, `expected <style>` |
 | `CONFUSED <a> / <b> (<colors>): ΔE2000 under 7: ...` | Two colors that must stay distinct are too close in at least one vision. Each vision gives its smallest difference and the model that gives it |
 | `MISSING  <check>` | Strict mode only: a color that the check needs is not set by the theme |
+| `IGNORED  <check or pair> ... (ignored: <reason>)` | A check or a pair that fails, but that the configuration ignores, with its reason. It does not count as a failure |
+| `configuration: <file>` | The configuration that applies to the theme, with its thresholds when they differ from the defaults |
 | `ERROR    <reason>` | The theme cannot be read; VS Code would refuse it too |
 | The summary line | Checks that pass, pairs that stay distinct (each pair counted once in each of the 4 visions), then information: colors that VS Code does not show, styles of WCAG 1.4.1, achromatopsia |
 | The last line | Themes audited, themes with failures, failures (failed checks, plus confused pairs counted once in each vision where they are confused), and themes that cannot be read |
@@ -175,6 +178,41 @@ jobs:
 ```
 
 The first step fails the job when a check fails (exit code `1`) or a theme cannot be read (`2`). Give a fixed version (`@0.1.2`), so that a new release of the package, with new checks or the colors of a newer VS Code, does not change the result of a commit. With the package in `devDependencies`, `npm ci` then `npx vscode-theme-audit .` uses the version of `package-lock.json`.
+
+## Configuration
+
+A theme extension can adapt the audit with a file `.vscode-theme-audit.json` in its folder, next to its `package.json`. The command finds it for the folder, for a theme file of the extension, and inside a `.vsix` that contains it. `--config <file>` gives another file for every input instead. The file is JSON with comments, as the settings of VS Code:
+
+```jsonc
+{
+  // Completion and validation in VS Code
+  "$schema": "https://raw.githubusercontent.com/mickaellherminez/vscode-theme-audit/main/schema/config-v1.schema.json",
+  "thresholds": {
+    "deltaE2000": 10
+  },
+  "ignore": [
+    { "check": "Line numbers", "theme": "My Theme Dark", "reason": "Dimmed on purpose; the active line number passes" },
+    { "pair": ["keyword", "function"], "view": "tritan", "reason": "Keywords are bold, functions are not" }
+  ]
+}
+```
+
+With the package installed in the project, `"$schema": "./node_modules/vscode-theme-audit/schema/config-v1.schema.json"` uses the schema of that version.
+
+**Thresholds.** Four reference thresholds can be changed. Each check that uses the default value uses the new one: [the list of checks](docs/checks.md) gives the minimum of each check.
+
+| Threshold | Default | Checks |
+| --- | --- | --- |
+| `text` | 4.5 | Contrast of text, [WCAG 2.2 AA](https://www.w3.org/TR/WCAG22/#contrast-minimum): every check whose minimum is 4.5 |
+| `enhancedText` | 7 | Contrast of text in high contrast themes, and of the main text in strict mode, [WCAG 2.2 AAA](https://www.w3.org/TR/WCAG22/#contrast-enhanced): every check whose minimum is 7 |
+| `nonText` | 3 | Contrast of indicators, borders, icons and lines, [WCAG 2.2](https://www.w3.org/TR/WCAG22/#non-text-contrast): every check whose minimum is 3 |
+| `deltaE2000` | 7 | CIEDE2000 difference between colors that must stay distinct, in every vision: a project rule |
+
+A threshold can be raised freely. A lower one gives a warning at the top of the report, since the audit then no longer follows WCAG or the rule. The other minimums, such as those for a selection to stay visible (1.2 to 2), do not change: an exception covers a particular case.
+
+**Exceptions.** Each entry of `ignore` names a check by its exact label, as the report writes it, or a pair of colors, in either order. It applies to every theme of the extension unless `theme` names one, and to every vision unless `view` names one (`normal`, `protan`, `deutan` or `tritan`). Its `reason` is required. The report keeps each ignored check and pair: the text report shows them as `IGNORED` with their reason, and the JSON report gives them an `ignored` field with it. They do not count as failures, so they do not change the exit code. An exception that names nothing, such as a label with a typo, or that names only checks that pass, gives a warning: it can be removed before it hides a future failure.
+
+An invalid configuration stops the command with exit code `2` and says what is wrong. To go back to the defaults, delete the file, or the entries you no longer want. To keep the file out of the `.vsix` you publish, list it in `.vscodeignore`; the audit of that `.vsix` then uses the defaults, unless you give `--config`.
 
 ## What it checks
 
@@ -263,7 +301,7 @@ Before version 1.0.0, the API can change in any release, as [Semantic Versioning
 ## Limits
 
 - **Measurements and simulations, not people.** No calculation replaces testing with the people concerned. The color blindness simulations are models of dichromacy, which disagree with each other and approximate the vision of each person; that is why a pair must stay distinct with all of them.
-- **Thresholds are project rules.** WCAG sets the contrast minimums. The color distinction threshold (ΔE2000 of 7) and the minimums for selections are practical rules, not standards.
+- **Thresholds are project rules.** WCAG sets the contrast minimums. The color distinction threshold (ΔE2000 of 7) and the minimums for selections are practical rules, not standards. A configuration can change four thresholds, and ignore checks with a reason: a report made with one says so (see [Configuration](#configuration)).
 - **JSON themes only.** TextMate theme files (`.tmTheme`), an older format, are not read yet. Product icon and file icon themes are not color themes and are not read.
 - **Open VSX, not the Visual Studio Marketplace.** Extensions are downloaded from Open VSX only (see [Usage](#usage)). A `.vsix` must take less than 200 MB once extracted, in 10,000 files at most: a limit against archives made to fill the disk; theme extensions take a few megabytes.
 - **Default settings of VS Code.** The terminal is measured with its default minimum contrast (`terminal.integrated.minimumContrastRatio`: 4.5), and the selected text of the terminal without the adjustments of xterm.js.

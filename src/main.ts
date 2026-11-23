@@ -33,6 +33,10 @@ A theme is:
 Options:
   --json         Print the report as JSON, for CI (format 1, described by
                  schema/report-v1.schema.json in the package)
+  --config <file>
+                 Use this configuration for every theme, instead of the
+                 .vscode-theme-audit.json of each extension folder:
+                 thresholds, and checks or pairs to ignore with a reason
   --strict       Apply the rules of 365 Day & Night: every color that a check
                  uses must be set by the theme, 7:1 for the main text, the
                  styles of WCAG 1.4.1, required keys and semantic rules, and
@@ -47,6 +51,28 @@ Exit codes:
 `;
 
 const OPTIONS = new Set(['-h', '--help', '-v', '--version', '--json', '--strict']);
+
+/** The options and the inputs of the command line; `--config <file>` and `--config=<file>` take a value. */
+function parseArgs(args: readonly string[]): { flags: Set<string>; config?: string; inputs: string[]; error?: string } {
+  const flags = new Set<string>();
+  const inputs: string[] = [];
+  let config: string | undefined;
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i] ?? '';
+    if (arg === '--config' || arg.startsWith('--config=')) {
+      const value = arg === '--config' ? args[++i] : arg.slice('--config='.length);
+      if (value === undefined || value === '' || (arg === '--config' && value.startsWith('-'))) return { flags, inputs, error: '--config needs a file' };
+      if (config !== undefined) return { flags, inputs, error: '--config is given twice' };
+      config = value;
+    } else if (arg.startsWith('-')) {
+      if (!OPTIONS.has(arg)) return { flags, inputs, error: `Unknown option: ${arg}` };
+      flags.add(arg);
+    } else {
+      inputs.push(arg);
+    }
+  }
+  return config === undefined ? { flags, inputs } : { flags, config, inputs };
+}
 
 /** Version of the package, read from its package.json (one folder above src/ and dist/). */
 export function packageVersion(): string {
@@ -67,24 +93,25 @@ export async function main(args: readonly string[], output: Output = consoleOutp
     output.out(`${packageVersion()}\n`);
     return 0;
   }
-  const unknown = args.find((arg) => arg.startsWith('-') && !OPTIONS.has(arg));
-  if (unknown) {
-    output.err(`Unknown option: ${unknown}\n\n${HELP}`);
+  const { flags, config, inputs, error } = parseArgs(args);
+  if (error !== undefined) {
+    output.err(`${error}\n\n${HELP}`);
     return 2;
   }
-  const paths = args.filter((arg) => !arg.startsWith('-'));
-  if (paths.length === 0) {
+  if (inputs.length === 0) {
     output.err(HELP);
     return 2;
   }
   let report;
   try {
-    report = await auditInputs(paths, { strict: args.includes('--strict'), version: packageVersion(), cwd, ...(fetcher ? { fetcher } : {}) });
+    report = await auditInputs(inputs, {
+      strict: flags.has('--strict'), version: packageVersion(), cwd, ...(config === undefined ? {} : { config }), ...(fetcher ? { fetcher } : {}),
+    });
   } catch (error) {
     if (!(error instanceof ThemeError)) throw error;
     output.err(`vscode-theme-audit: ${error.message}\n`);
     return 2;
   }
-  output.out(args.includes('--json') ? JSON.stringify(report, null, 2) + '\n' : textReport(report));
+  output.out(flags.has('--json') ? JSON.stringify(report, null, 2) + '\n' : textReport(report));
   return exitCode(report);
 }

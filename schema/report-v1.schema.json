@@ -63,10 +63,23 @@
         "file": { "type": "string", "description": "The theme file, relative to the folder where the command ran. In a .vsix, the .vsix then the path inside it (my-theme-1.2.3.vsix/extension/themes/dark.json); for an Open VSX id, the id with the version found (open-vsx:publisher.name@1.2.3/extension/themes/dark.json)." },
         "uiTheme": { "$ref": "#/$defs/uiTheme" },
         "warnings": { "$ref": "#/$defs/warnings" },
+        "config": { "type": "string", "description": "The configuration file that applies to this theme (.vscode-theme-audit.json or --config)." },
+        "thresholds": {
+          "type": "object",
+          "description": "The thresholds of that configuration, when they differ from the defaults (4.5, 7, 3 and 7).",
+          "required": ["text", "enhancedText", "nonText", "deltaE2000"],
+          "additionalProperties": false,
+          "properties": {
+            "text": { "type": "number" },
+            "enhancedText": { "type": "number" },
+            "nonText": { "type": "number" },
+            "deltaE2000": { "type": "number" }
+          }
+        },
         "error": { "type": "string", "description": "Why the theme cannot be read. The other fields are then absent." },
         "summary": {
           "type": "object",
-          "required": ["checks", "failed", "missing", "information", "pairs", "confused"],
+          "required": ["checks", "failed", "missing", "information", "pairs", "confused", "ignored"],
           "additionalProperties": false,
           "properties": {
             "checks": { "type": "integer", "minimum": 0 },
@@ -74,7 +87,8 @@
             "missing": { "type": "integer", "minimum": 0, "description": "Colors that VS Code does not show, outside strict mode: information." },
             "information": { "type": "integer", "minimum": 0, "description": "Checks for information that do not pass." },
             "pairs": { "type": "integer", "minimum": 0 },
-            "confused": { "type": "integer", "minimum": 0 }
+            "confused": { "type": "integer", "minimum": 0 },
+            "ignored": { "type": "integer", "minimum": 0, "description": "Checks and pairs that would fail, but that the configuration ignores, each with its reason." }
           }
         },
         "checks": { "type": "array", "items": { "$ref": "#/$defs/check" } },
@@ -106,6 +120,7 @@
         "minimum": { "type": ["number", "string"], "description": "The minimum value, or the style expected (italic, bold, underline, strikethrough)." },
         "status": { "enum": ["pass", "fail", "missing"], "description": "missing: a color is not there, a failure only in strict mode." },
         "information": { "const": true, "description": "Measured for information: never a failure." },
+        "ignored": { "type": "string", "description": "Ignored by the configuration, with this reason: never a failure, still reported." },
         "colors": { "$ref": "#/$defs/colors", "description": "The two colors measured, as shown: opaque, after composition." }
       }
     },
@@ -120,7 +135,8 @@
         "model": { "type": ["string", "null"], "description": "The simulation model that gives it; null in normal vision." },
         "cie76": { "type": "number" },
         "colors": { "$ref": "#/$defs/colors" },
-        "status": { "enum": ["pass", "fail"] }
+        "status": { "enum": ["pass", "fail"] },
+        "ignored": { "type": "string", "description": "Ignored by the configuration, with this reason: never a failure, still reported." }
       }
     },
     "pairDistance": {

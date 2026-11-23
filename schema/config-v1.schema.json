@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/mickaellherminez/vscode-theme-audit/main/schema/config-v1.schema.json",
+  "title": "vscode-theme-audit configuration, version 1",
+  "description": "The file .vscode-theme-audit.json of a theme extension, or the file given with --config: the reference thresholds, and the checks or pairs to ignore, each with a reason that the report shows.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string", "description": "The address of this schema, for completion in VS Code." },
+    "thresholds": {
+      "type": "object",
+      "description": "The reference thresholds. A threshold lower than its default gives a warning in the report.",
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "type": "number", "minimum": 1, "maximum": 21, "default": 4.5,
+          "description": "Contrast of text, WCAG 2.2 AA (1.4.3): every check whose minimum is 4.5 uses this one."
+        },
+        "enhancedText": {
+          "type": "number", "minimum": 1, "maximum": 21, "default": 7,
+          "description": "Contrast of text in high contrast themes, and of the main text in strict mode, WCAG 2.2 AAA (1.4.6): every check whose minimum is 7."
+        },
+        "nonText": {
+          "type": "number", "minimum": 1, "maximum": 21, "default": 3,
+          "description": "Contrast of indicators, borders, icons and lines, WCAG 2.2 (1.4.11): every check whose minimum is 3."
+        },
+        "deltaE2000": {
+          "type": "number", "minimum": 0, "maximum": 100, "default": 7,
+          "description": "CIEDE2000 difference under which two colors that must stay distinct are confused, in every vision: a project rule, not a standard."
+        }
+      }
+    },
+    "ignore": {
+      "type": "array",
+      "description": "Checks or pairs that do not count as failures. The report still shows each one, as ignored, with its reason. An exception that names nothing, or only checks that pass, gives a warning.",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": ["check", "reason"],
+            "additionalProperties": false,
+            "properties": {
+              "check": { "type": "string", "pattern": "\\S", "description": "The exact label of a check, as the report writes it, such as \"Line numbers\"." },
+              "theme": { "type": "string", "pattern": "\\S", "description": "The name of the theme it applies to; every theme when absent." },
+              "reason": { "type": "string", "pattern": "\\S", "description": "Why this check is ignored: the report shows it." }
+            }
+          },
+          {
+            "type": "object",
+            "required": ["pair", "reason"],
+            "additionalProperties": false,
+            "properties": {
+              "pair": {
+                "type": "array", "items": { "type": "string", "pattern": "\\S" }, "minItems": 2, "maxItems": 2,
+                "description": "Two colors that must stay distinct, in either order, as the report names them: [\"keyword\", \"function\"], [\"error\", \"warning\"], [\"Git graph 1\", \"Git graph 2\"]..."
+              },
+              "view": { "enum": ["normal", "protan", "deutan", "tritan"], "description": "The vision it applies to; every vision when absent." },
+              "theme": { "type": "string", "pattern": "\\S", "description": "The name of the theme it applies to; every theme when absent." },
+              "reason": { "type": "string", "pattern": "\\S", "description": "Why this pair is ignored: the report shows it." }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

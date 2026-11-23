@@ -25,4 +25,6 @@ export { REPORT_FORMAT, auditInputs, auditPaths, exitCode, textReport } from './
 export { OPEN_VSX_API, OPEN_VSX_PREFIX, downloadOpenVsx, fetchFile, isOpenVsxInput, parseOpenVsxInput } from './open-vsx.ts';
 export type { Fetcher, OpenVsxRef } from './open-vsx.ts';
 export { VSIX_LIMITS, extractVsix } from './vsix.ts';
-export type { Report, ThemeReport, ThemeSummary, VarietyReport } from './report.ts';
+export { CONFIG_FILE, DEFAULT_THRESHOLDS, applyConfig, findConfig, loadConfig, loweredThresholds } from './config.ts';
+export type { Config, Exception, ExceptionUse, Thresholds } from './config.ts';
+export type { AuditPathOptions, Report, ThemeReport, ThemeSummary, VarietyReport } from './report.ts';
