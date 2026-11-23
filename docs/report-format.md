@@ -1,6 +1,6 @@
 # The JSON report, format 1
 
-`vscode-theme-audit --json` prints one JSON document on the standard output. It is described by the schema [`schema/report-v1.schema.json`](../schema/report-v1.schema.json) (JSON Schema 2020-12), published in the package (`node_modules/vscode-theme-audit/schema/report-v1.schema.json` once installed). The API gives the same object: `auditPaths()` (see the [README](../README.md#api)).
+`vscode-theme-audit --json` prints one JSON document on the standard output. It is described by the schema [`schema/report-v1.schema.json`](../schema/report-v1.schema.json) (JSON Schema 2020-12), published in the package (`node_modules/vscode-theme-audit/schema/report-v1.schema.json` once installed). The API gives the same object: `auditInputs()`, or `auditPaths()` for theme files and folders (see the [README](../README.md#api)).
 
 ## Versions
 
@@ -68,7 +68,7 @@ The report of a test theme of this repository, with each list cut to one entry:
 | Field | Type | Meaning |
 | --- | --- | --- |
 | `label` | string | The name of the theme, as VS Code shows it in the theme picker |
-| `file` | string | The theme file, relative to the folder where the command ran |
+| `file` | string | The theme file, relative to the folder where the command ran. In a `.vsix`, the `.vsix` then the path inside it (`my-theme-1.2.3.vsix/extension/themes/dark.json`); for an Open VSX id, the id with the version found (`open-vsx:publisher.name@1.2.3/extension/themes/dark.json`) |
 | `uiTheme` | `"vs"`, `"vs-dark"`, `"hc-black"`, `"hc-light"` | Its type: light, dark, high contrast dark, high contrast light |
 | `warnings` | string[] | What VS Code accepts but the author probably did not mean: an invalid color shown in red, a value that is not a color, a file name whose case differs. Not failures |
 | `error` | string | Only when the theme cannot be read: why. The fields below are then absent |

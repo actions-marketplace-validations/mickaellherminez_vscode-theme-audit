@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 
-import { auditPaths, exitCode, textReport } from './report.ts';
+import type { Fetcher } from './open-vsx.ts';
+import { auditInputs, exitCode, textReport } from './report.ts';
 import { ThemeError } from './theme.ts';
 import { VSCODE_SOURCE } from './vscode-colors.ts';
 
@@ -15,14 +16,19 @@ const consoleOutput: Output = {
   err: (text) => process.stderr.write(text),
 };
 
-export const HELP = `Usage: vscode-theme-audit [options] <theme file or extension folder>...
+export const HELP = `Usage: vscode-theme-audit [options] <theme>...
 
 Accessibility audit for VS Code color themes: WCAG contrast, and color
 pairs that must stay distinct with color blindness simulations, measured
 on the colors that VS Code ${VSCODE_SOURCE.version} shows. Themes from the Visual Studio
 Marketplace and Open VSX use the same format.
 
-An extension folder is audited with every theme of its package.json.
+A theme is:
+  a theme file                     themes/my-theme-color-theme.json
+  an extension folder              every theme of its package.json
+  a packaged extension             my-theme-1.2.3.vsix
+  an extension of Open VSX         open-vsx:publisher.name[@version]
+                                   (downloaded from open-vsx.org)
 
 Options:
   --json         Print the report as JSON, for CI (format 1, described by
@@ -48,8 +54,11 @@ export function packageVersion(): string {
   return manifest.version;
 }
 
-/** Runs the command and returns its exit code: 0 when every check passes, 1 when one fails, 2 for an error. */
-export function main(args: readonly string[], output: Output = consoleOutput, cwd = process.cwd()): number {
+/**
+ * Runs the command and resolves to its exit code: 0 when every check passes, 1 when one fails, 2 for an error.
+ * `fetcher` downloads the extensions of Open VSX (fetch by default).
+ */
+export async function main(args: readonly string[], output: Output = consoleOutput, cwd = process.cwd(), fetcher?: Fetcher): Promise<number> {
   if (args.includes('-h') || args.includes('--help')) {
     output.out(HELP);
     return 0;
@@ -70,7 +79,7 @@ export function main(args: readonly string[], output: Output = consoleOutput, cw
   }
   let report;
   try {
-    report = auditPaths(paths, { strict: args.includes('--strict'), version: packageVersion(), cwd });
+    report = await auditInputs(paths, { strict: args.includes('--strict'), version: packageVersion(), cwd, ...(fetcher ? { fetcher } : {}) });
   } catch (error) {
     if (!(error instanceof ThemeError)) throw error;
     output.err(`vscode-theme-audit: ${error.message}\n`);

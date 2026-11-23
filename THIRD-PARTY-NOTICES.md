@@ -7,6 +7,7 @@ Parts of this package are ported from projects of Microsoft, under the MIT Licen
 - `src/colors.ts` and the first tests of `test/colors.test.ts`: from `color.ts`, `colorUtils.ts`, `colorThemeData.ts`, `colorExtensionPoint.ts`, `color.test.ts` and `colorUtils.test.ts` of [Visual Studio Code](https://github.com/microsoft/vscode) (1.147.0): the colors of VS Code, their transforms, and how a default color is resolved.
 - `src/vscode-colors.ts`: the default colors that [Visual Studio Code](https://github.com/microsoft/vscode) registers (1.147.0), extracted from its sources by `scripts/vscode-colors.ts`.
 - `src/theme.ts` and `src/tokens.ts`: rules of `colorThemeData.ts` and `themeCompatibility.ts` of [Visual Studio Code](https://github.com/microsoft/vscode) (1.147.0): how a color theme is loaded, which TextMate rules it gives, and the default colors involved.
+- `src/vsix.ts`: `extract()` of `src/vs/base/node/zip.ts` of [Visual Studio Code](https://github.com/microsoft/vscode) (1.147.0): how an extension is extracted from its `.vsix`, with [yauzl](https://github.com/thejoshwolfe/yauzl) (MIT), a dependency of this package.
 
 `terminalColor()` in `src/audit.ts`, and the expected colors of its test in `test/audit.test.ts`: from `rgba.ensureContrastRatio` in `src/common/Color.ts` of [xterm.js](https://github.com/xtermjs/xterm.js) 6.1.0-beta.337, the terminal of VS Code 1.147.0, under the MIT License: how the terminal changes the color of a text to reach its minimum contrast.
 

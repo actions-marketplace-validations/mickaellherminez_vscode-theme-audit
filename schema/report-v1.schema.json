@@ -60,7 +60,7 @@
       "additionalProperties": false,
       "properties": {
         "label": { "type": "string" },
-        "file": { "type": "string", "description": "The theme file, relative to the folder where the command ran." },
+        "file": { "type": "string", "description": "The theme file, relative to the folder where the command ran. In a .vsix, the .vsix then the path inside it (my-theme-1.2.3.vsix/extension/themes/dark.json); for an Open VSX id, the id with the version found (open-vsx:publisher.name@1.2.3/extension/themes/dark.json)." },
         "uiTheme": { "$ref": "#/$defs/uiTheme" },
         "warnings": { "$ref": "#/$defs/warnings" },
         "error": { "type": "string", "description": "Why the theme cannot be read. The other fields are then absent." },

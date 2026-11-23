@@ -35,6 +35,16 @@ Where the package departs from VS Code, so that the audit gives the same result 
 
 - A theme file or an `include` whose path differs from the file name only by case (`theme.json` for `Theme.json`) is found by VS Code on macOS and Windows, where file names usually ignore case, but not on Linux. The package reads it on every system, with a warning. Bearded Theme 10.1.0, in the corpus, has one. A folder that exists without being listed, such as a short 8.3 name on Windows (`RUNNER~1` for `runneradmin`), is kept as written, and the names after it are still checked.
 
+## Packaged extensions and Open VSX
+
+`src/vsix.ts` extracts a `.vsix` as VS Code installs it (`extract()` of [`zip.ts`](https://github.com/microsoft/vscode/blob/main/src/vs/base/node/zip.ts), 1.147.0): with [yauzl](https://github.com/thejoshwolfe/yauzl), the zip library of VS Code, a dependency of the package, only the entries under `extension`, without this prefix. A `.vsix` can come from anywhere, so the extraction refuses an entry outside the target folder (yauzl refuses absolute names and `..` too), more than 10,000 entries, more than 200 MB of extracted files (`VSIX_LIMITS`), and a file larger than its declared size.
+
+`src/open-vsx.ts` downloads an extension through the public API of [Open VSX](https://open-vsx.org/): `GET /api/{namespace}/{name}[/{version}]` gives the version, the address of the `.vsix` and that of its SHA-256, which the download must match. The id is checked before any request. It is the only code of the package that uses the network, and the tests replace `fetch` with a stand-in (`test/open-vsx.test.ts`); the corpus test downloads one extension for real.
+
+`auditInputs()` in `src/report.ts` extracts each `.vsix` and Open VSX id into a temporary folder, audits it with the rest, and deletes the folder, even after an error. The report names these themes by the `.vsix` or the id, then their path inside the extension. The Visual Studio Marketplace is not supported: its download API is not documented ([#16](https://github.com/mickaellherminez/vscode-theme-audit/issues/16)).
+
+`test/vsix.test.ts` writes its `.vsix` files with a small zip writer (`test/zip.ts`), valid or broken. The corpus test audits each `.vsix` of the corpus directly too, and checks that it gives the same themes and warnings as the extracted folder.
+
 ## Token colors
 
 VS Code does not choose the color of a token itself: it gives the TextMate rules of the theme to [vscode-textmate](https://github.com/microsoft/vscode-textmate), which colors the code. `src/textmate.ts` ports how vscode-textmate matches a scope (`src/theme.ts`, commit `98cc6331dc`), with its tests in `test/textmate.test.ts`. `src/tokens.ts` adds what VS Code does before (`tokenColors` in `colorThemeData.ts`): a first rule with the editor colors, or their defaults; rules without scope left out; colors written in full and in uppercase; colors for log files when the theme sets none.
