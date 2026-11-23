@@ -45,6 +45,12 @@ Where the package departs from VS Code, so that the audit gives the same result 
 
 `test/vsix.test.ts` writes its `.vsix` files with a small zip writer (`test/zip.ts`), valid or broken. The corpus test audits each `.vsix` of the corpus directly too, and checks that it gives the same themes and warnings as the extracted folder.
 
+## Configuration
+
+`src/config.ts` reads `.vscode-theme-audit.json` (or the file of `--config`), checks it with the same rules as [`schema/config-v1.schema.json`](schema/config-v1.schema.json), and applies it to the audit of each theme (`applyConfig()`): the four thresholds replace the minimums 4.5, 7 and 3 of the checks and the CIEDE2000 minimum of the pairs, and each exception gives an `ignored` field, its reason, to the checks and pairs it names. `isFailure()` never counts an ignored check. `auditEntries()` in `src/report.ts` finds the file of each input, reads it once, warns about a lowered threshold, and at the end about each exception that named nothing or only checks that pass.
+
+`test/config.test.ts` checks every rule on a copy of `test/data/oracle-extension`, and that the package and the schema refuse the same invalid files. When a field is added to the configuration, add it to the schema, to `loadConfig()` and to that test in the same pull request. Version 1 of the configuration can gain optional fields; removing one or changing its meaning means a new schema file, `config-v2.schema.json`.
+
 ## Token colors
 
 VS Code does not choose the color of a token itself: it gives the TextMate rules of the theme to [vscode-textmate](https://github.com/microsoft/vscode-textmate), which colors the code. `src/textmate.ts` ports how vscode-textmate matches a scope (`src/theme.ts`, commit `98cc6331dc`), with its tests in `test/textmate.test.ts`. `src/tokens.ts` adds what VS Code does before (`tokenColors` in `colorThemeData.ts`): a first rule with the editor colors, or their defaults; rules without scope left out; colors written in full and in uppercase; colors for log files when the theme sets none.

@@ -10,7 +10,7 @@ Every check of the audit, with the colors it reads, its minimum and where that m
 - **Colors read:** by default, the colors that VS Code 1.147.0 shows: the theme, then the defaults of VS Code. A check whose color VS Code does not show at all has the status `missing`, which is information. In strict mode, only the colors that the theme sets count, and a missing one is a failure.
 - **Color difference:** CIEDE2000 (ΔE2000), as specified in CIE 15:2004, implemented after G. Sharma, W. Wu and E. N. Dalal, *Color Research & Application* 30(1), 2005, and checked against their test data. The report also gives the CIE76 difference (the distance in CIELAB) for information.
 
-In the tables, *4.5* means 4.5:1, and 7:1 in high contrast.
+In the tables, *4.5* means 4.5:1, and 7:1 in high contrast. A configuration (`.vscode-theme-audit.json`, see the [README](../README.md#configuration)) can change the minimums 4.5, 7 and 3, and the CIEDE2000 minimum of 7, and ignore a check by its label with a reason.
 
 ## Editor
 

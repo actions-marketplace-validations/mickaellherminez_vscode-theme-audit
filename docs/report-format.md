@@ -54,7 +54,7 @@ The report of a test theme of this repository, with each list cut to one entry:
 | `tool.version` | string | The version of the package that wrote the report |
 | `vscode.version`, `vscode.commit` | string | The release of VS Code whose default colors and rules the audit follows, and its commit (40 hexadecimal digits) |
 | `strict` | boolean | Whether the rules of 365 Day & Night were applied (`--strict`) |
-| `minimumDeltaE2000` | number | The CIEDE2000 difference under which two colors that must stay distinct are confused: 7 |
+| `minimumDeltaE2000` | number | The default CIEDE2000 difference under which two colors that must stay distinct are confused: 7. A configuration can change it for its themes (`thresholds`) |
 | `warnings` | string[] | Warnings about the extensions themselves: their `package.json` and the colors they contribute |
 | `themes` | object[] | One entry per theme, in the order of the paths, then of `contributes.themes` (see [A theme](#a-theme)) |
 | `variety` | object[] | In strict mode, one entry per extension folder given as a path and per theme type with two themes or more (see [Variety](#variety)). Empty otherwise |
@@ -71,13 +71,16 @@ The report of a test theme of this repository, with each list cut to one entry:
 | `file` | string | The theme file, relative to the folder where the command ran. In a `.vsix`, the `.vsix` then the path inside it (`my-theme-1.2.3.vsix/extension/themes/dark.json`); for an Open VSX id, the id with the version found (`open-vsx:publisher.name@1.2.3/extension/themes/dark.json`) |
 | `uiTheme` | `"vs"`, `"vs-dark"`, `"hc-black"`, `"hc-light"` | Its type: light, dark, high contrast dark, high contrast light |
 | `warnings` | string[] | What VS Code accepts but the author probably did not mean: an invalid color shown in red, a value that is not a color, a file name whose case differs. Not failures |
+| `config` | string | Only with a configuration: its file (`.vscode-theme-audit.json` or `--config`) |
+| `thresholds` | object | Only when the configuration changes them: `text`, `enhancedText`, `nonText` and `deltaE2000` |
 | `error` | string | Only when the theme cannot be read: why. The fields below are then absent |
 | `summary.checks` | integer | Number of checks |
-| `summary.failed` | integer | Checks that fail (in strict mode, missing colors included) |
+| `summary.failed` | integer | Checks that fail (in strict mode, missing colors included), without those that the configuration ignores |
 | `summary.missing` | integer | Outside strict mode: colors that VS Code does not show, for information |
 | `summary.information` | integer | Checks for information that do not pass: the styles of WCAG 1.4.1, outside strict mode |
 | `summary.pairs` | integer | Entries of `distinctions`: each pair of colors that must stay distinct, once in each of the 4 visions |
-| `summary.confused` | integer | Entries of `distinctions` that fail: a pair confused in 2 visions counts 2 |
+| `summary.confused` | integer | Entries of `distinctions` that fail: a pair confused in 2 visions counts 2. Ignored pairs are not counted |
+| `summary.ignored` | integer | Checks and entries of `distinctions` that fail, but that the configuration ignores |
 | `checks` | object[] | Every check (see [A check](#a-check)) |
 | `distinctions` | object[] | Every pair in every vision (see [A pair](#a-pair)) |
 | `achromatopsia` | object[] | The syntax colors seen without color: information only |
@@ -91,9 +94,10 @@ The report of a test theme of this repository, with each list cut to one entry:
 | `minimum` | number or string | The minimum value, or the style expected: `"italic"`, `"bold"`, `"underline"`, `"strikethrough"` |
 | `status` | `"pass"`, `"fail"`, `"missing"` | `missing`: a color the check needs is not there, a failure only in strict mode |
 | `information` | `true` | Present only on checks measured for information, which are never failures |
+| `ignored` | string | Present only on checks that the configuration ignores: its reason. They are never failures |
 | `colors` | [string, string] | Present when both colors exist: the text and the background as shown, opaque, after a transparent color is composed on what is under it |
 
-A check is a failure when its `status` is `"fail"` and it has no `information`, or, in strict mode, when its `status` is `"missing"`. This is `isFailure(check, strict)` in the API.
+A check is a failure when its `status` is `"fail"` and it has neither `information` nor `ignored`, or, in strict mode, when its `status` is `"missing"` without `ignored`. This is `isFailure(check, strict)` in the API. The `minimum` of a check is the threshold of the configuration, when it changes the default one.
 
 ## A pair
 
@@ -105,7 +109,8 @@ A check is a failure when its `status` is `"fail"` and it has no `information`, 
 | `model` | string or `null` | The model that gives it: `"Machado 2009"`, `"Brettel 1997"` or `"Viénot 1999"`; `null` in normal vision |
 | `cie76` | number | The CIE76 difference with the same model, for information |
 | `colors` | [string, string] | The two colors, as the theme shows them (not simulated) |
-| `status` | `"pass"`, `"fail"` | `fail` when `deltaE2000` is under `minimumDeltaE2000` |
+| `status` | `"pass"`, `"fail"` | `fail` when `deltaE2000` is under `minimumDeltaE2000`, or under the `deltaE2000` threshold of the configuration |
+| `ignored` | string | Present only on pairs that the configuration ignores: its reason. They are never failures |
 
 An entry of `achromatopsia` has `pair`, `deltaE2000`, `cie76` (both measured on the colors seen without color) and `colors` (as the theme shows them), and no `status`.
 

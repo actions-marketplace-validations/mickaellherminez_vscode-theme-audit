@@ -19,8 +19,8 @@ const [pack] = JSON.parse(execSync('npm pack --dry-run --json --ignore-scripts',
 if (!pack) throw new Error('npm pack gave no result');
 const files = pack.files.map((file) => file.path).sort();
 
-test('the package contains the compiled code, the schema and the documents only', () => {
-  const documents = ['CHANGELOG.md', 'LICENSE', 'README.md', 'THIRD-PARTY-NOTICES.md', 'package.json', 'schema/report-v1.schema.json'];
+test('the package contains the compiled code, the schemas and the documents only', () => {
+  const documents = ['CHANGELOG.md', 'LICENSE', 'README.md', 'THIRD-PARTY-NOTICES.md', 'package.json', 'schema/config-v1.schema.json', 'schema/report-v1.schema.json'];
   const sources = readdirSync(new URL('src/', ROOT)).filter((name) => name.endsWith('.ts')).map((name) => name.slice(0, -'.ts'.length));
   const compiled = sources.flatMap((name) => [`dist/${name}.d.ts`, `dist/${name}.js`]);
   assert.deepEqual(files, [...documents, ...compiled].sort());
