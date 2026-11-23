@@ -1,5 +1,7 @@
 # vscode-theme-audit
 
+[![npm version](https://img.shields.io/npm/v/vscode-theme-audit)](https://www.npmjs.com/package/vscode-theme-audit)
+
 Accessibility audit for VS Code color themes, for theme authors and their CI: WCAG contrast of the text and the code, and color pairs that must stay distinct with color blindness simulations.
 
 > **Status: first releases (0.1).** Planned next: auditing a `.vsix` file or an Open VSX id, a configuration file, and a GitHub Action ([milestones](https://github.com/mickaellherminez/vscode-theme-audit/milestones)).
