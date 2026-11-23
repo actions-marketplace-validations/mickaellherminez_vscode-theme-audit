@@ -86,7 +86,7 @@ Outside strict mode, a color that VS Code does not show, and the styles of WCAG 
 The text report starts with the version of the package and of VS Code whose colors it uses. Then, for each theme, its name, its type and its file, followed by one line per problem. This is an excerpt of the report of a test theme of this repository (`test/data/oracle-extension/themes/dark.json`), which sets few colors:
 
 ```text
-vscode-theme-audit 0.1.1, colors of VS Code 1.147.0
+vscode-theme-audit 0.1.2, colors of VS Code 1.147.0
 
 Oracle Dark (vs-dark): test/data/oracle-extension/themes/dark.json
   FAIL     Line numbers: #858585 on #1B2230  4.32 < 4.5
@@ -117,7 +117,7 @@ To fix a failure, change the color named in the line: a check named `foreground 
 ```jsonc
 {
   "format": 1,                                   // the version of this format
-  "tool": { "name": "vscode-theme-audit", "version": "0.1.1" },
+  "tool": { "name": "vscode-theme-audit", "version": "0.1.2" },
   "vscode": { "version": "1.147.0", "commit": "8a14f0cc1b08d531eb83255ea3764ae22aa932b5" },
   "strict": false,
   "minimumDeltaE2000": 7,
@@ -155,8 +155,8 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 22
-      - run: npx --yes vscode-theme-audit@0.1.1 .
-      - run: npx --yes vscode-theme-audit@0.1.1 . --json > theme-audit.json
+      - run: npx --yes vscode-theme-audit@0.1.2 .
+      - run: npx --yes vscode-theme-audit@0.1.2 . --json > theme-audit.json
         if: always()
       - uses: actions/upload-artifact@v7
         if: always()
@@ -165,7 +165,7 @@ jobs:
           path: theme-audit.json
 ```
 
-The first step fails the job when a check fails (exit code `1`) or a theme cannot be read (`2`). Give a fixed version (`@0.1.1`), so that a new release of the package, with new checks or the colors of a newer VS Code, does not change the result of a commit. With the package in `devDependencies`, `npm ci` then `npx vscode-theme-audit .` uses the version of `package-lock.json`.
+The first step fails the job when a check fails (exit code `1`) or a theme cannot be read (`2`). Give a fixed version (`@0.1.2`), so that a new release of the package, with new checks or the colors of a newer VS Code, does not change the result of a commit. With the package in `devDependencies`, `npm ci` then `npx vscode-theme-audit .` uses the version of `package-lock.json`.
 
 ## What it checks
 
