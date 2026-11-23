@@ -1,0 +1,31 @@
+name: VS Code Theme Audit
+description: Audit the accessibility of VS Code color themes and write a Markdown report in the job summary.
+author: mickaellherminez
+
+inputs:
+  path:
+    description: A theme file, extension folder, .vsix file, or open-vsx:publisher.name[@version] id.
+    required: false
+    default: '.'
+  strict:
+    description: Apply the rules of 365 Day & Night (true or false).
+    required: false
+    default: 'false'
+  config:
+    description: A configuration file for the input; empty uses the configuration of the extension.
+    required: false
+    default: ''
+
+outputs:
+  report-path:
+    description: The Markdown report in the runner temporary folder, available for the rest of the job.
+  exit-code:
+    description: The audit exit code (0 passes, 1 has failures, 2 could not complete).
+
+runs:
+  using: node24
+  main: action/dist/index.cjs
+
+branding:
+  icon: eye
+  color: blue

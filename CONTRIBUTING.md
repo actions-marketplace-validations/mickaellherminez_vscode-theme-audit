@@ -169,7 +169,9 @@ The script gives the labels in English, as the package writes them, and stops on
 
 ## The command
 
-`src/main.ts` reads the options, `src/report.ts` audits the paths and writes the report. `auditPaths()` gives the report as an object, in the JSON format; `textReport()` writes it for people, and `exitCode()` gives the exit code.
+`src/main.ts` reads the options, `src/report.ts` audits the paths and writes the report. `auditPaths()` gives the report as an object, in the JSON format; `textReport()` writes it for people, and `exitCode()` gives the exit code. `--format text|json|markdown` selects the renderer, with `--json` kept as an alias for `--format json`; contradictory formats fail with exit code 2. Both the space and equals forms take a value.
+
+`src/markdown.ts` exports `markdownReport()`: the same audit, as GitHub Markdown for PR comments and job summaries. It escapes untrusted theme data and neutralizes mentions, preserves configuration reasons and information, and limits the output to 60,000 UTF-8 bytes. A truncation notice explains that the global totals still cover the complete audit. `test/markdown.test.ts` checks real audits, ignored results, unreadable themes, strict variety, hostile strings and large reports. To return to the text output, omit `--format` or use `--format text`; no JSON schema changes are involved.
 
 The JSON format is described by [`schema/report-v1.schema.json`](schema/report-v1.schema.json) (JSON Schema 2020-12), published with the package. The schema refuses unknown fields, so a field added to the report must be added to the schema in the same pull request. Format 1 can gain fields; removing a field or changing its meaning means format 2: a new schema file, `REPORT_FORMAT` in `src/report.ts`, and a line in the CHANGELOG. `test/cli.test.ts` checks every option and exit code, and validates each JSON report against the schema with [Ajv](https://ajv.js.org/), a development dependency.
 
@@ -204,8 +206,11 @@ To go back, check out `test/corpus/` from git and run `npm run test:corpus`: the
 | `npm run typecheck` | TypeScript, without writing files |
 | `npm test` | The tests of `test/*.test.ts`, with the test runner of Node.js, without the network |
 | `npm run build` | Compiles `src/` to `dist/`, the only folder of code published to npm |
+| `npm run build:action` | Bundles the GitHub Action and its licenses into `action/dist/`, tracked in Git and excluded from the npm package |
+| `npm run check:action` | Builds the action in memory and compares it with the shipped files without changing them |
+| `npm run test:action` | Runs the shipped action from an isolated folder without `node_modules` or the repository sources; also checks VSIX extraction and licenses |
 | `npm run test:package` | Builds, then checks the content of the package that npm would publish (`test/package/`): `dist/`, the JSON schema, README, LICENSE, CHANGELOG and THIRD-PARTY-NOTICES only, under 120 kB (500 kB unpacked) |
-| `npm run check` | All of the above, in this order |
+| `npm run check` | Lint, types, source tests, npm build and package tests, then action reproducibility and isolated action tests; it does not rewrite the shipped action |
 | `npm run test:corpus` | The corpus test, after downloading what the cache lacks |
 
 The [CI workflow](.github/workflows/ci.yml) runs them on every push and pull request, on Linux, Windows and macOS, with Node.js 22 and 24: theme authors use all three, and paths (`include`, `tokenColors` as a file, extension folders) differ between them. It also runs the built command. Its corpus job runs on the same systems, and keeps the `.vsix` files in a GitHub Actions cache, downloaded again only when `extensions.json` changes. `.gitattributes` keeps line feeds in every text file, so that Windows checks out the same bytes as the other systems.
@@ -214,13 +219,32 @@ The size limit of the package is in `test/package/package.test.ts` (`MAX_SIZE`, 
 
 The [CodeQL workflow](.github/workflows/codeql.yml) looks for security problems in the TypeScript code and in the workflows, on every pull request to `main`, on `main` and every Monday. Its results are in the Security tab.
 
+## The GitHub Action
+
+`action.yml` starts `action/dist/index.cjs` with the Node.js 24 runtime of GitHub Actions. `action/index.ts` embeds the package version at build time and starts `action/run.ts`, which reads literal inputs from the environment, calls `auditInputs()` directly, writes Markdown to `GITHUB_STEP_SUMMARY` and a copy in `RUNNER_TEMP`, sets its outputs, and returns 0, 1 or 2. It uses no shell, npm install, token or PR-comment API. The source tests inject an environment and output functions; each test file has its own temporary folder.
+
+After changing anything used by the action, including its embedded package version or third-party notices:
+
+```sh
+npm run build:action
+npm run check
+```
+
+Include `action/dist/index.cjs` and `action/dist/LICENSES.txt` in the same change. `scripts/action.ts` uses the pinned esbuild development dependency and records all bundled dependencies' license files, the project license and the existing third-party notices. It prefers the ESM entry of `jsonc-parser`: the UMD factory hides relative `require()` calls from the bundler. The isolated VSIX and configuration tests check that the action actually contains its dependencies. To undo a change, restore its sources, manifest/lockfile and generated action files together, then run the checks. The npm `dist/` stays generated and ignored; the action's `action/dist/` is deliberately tracked in Git.
+
+The [action workflow](.github/workflows/action.yml) demonstrates the action in this repository on Linux, Windows and macOS, with the committed bundle of the checked-out revision and existing theme fixtures. It does not install dependencies or rebuild the action before calling it. Expected failures use `continue-on-error` and are asserted afterward; a production audit should fail its job normally. The existing CI also checks bundle reproducibility and isolated execution on both supported Node.js versions. This demonstration replaces a separate sample repository; it does not claim adoption by another repository.
+
+The [public action workflow](.github/workflows/action-public.yml) verifies download of reviewed development commit `a37f9fc4e1e5743c16ce569eaa657ad3fb7466ce` on Ubuntu. A non-cone sparse checkout keeps only the theme fixtures, their configuration and the assertion script; a guard checks that the local action, engine sources and npm dependencies are absent. It calls the public action for the same success and expected failures, then checks the outputs and saved reports. This tests a fixed public revision; the three-system local demonstration tests the candidate commit. No new repository is needed.
+
+To update the public test, first push and review an action commit, then replace all three public `uses` references and the matching SHA references in the README, action guide and this file with its full SHA. Rerun the workflow and inspect the actual job summary. Restore the previous references to go back. Before the first Marketplace listing, verify that the public test names the intended version and has passed. The owner publishes the listing on github.com; see [the action guide](docs/github-action.md#publication-on-the-marketplace) for requirements, the release/tag interaction and removal. Never create a version tag merely to test the listing: it triggers the npm release workflow.
+
 ## Releases
 
 Versions are published to npm only by the [release workflow](.github/workflows/release.yml), when a version tag is pushed. npm authenticates the workflow with OpenID Connect ([trusted publishing](https://docs.npmjs.com/trusted-publishers)): no npm token is stored in the repository. npm publishes the [provenance](https://docs.npmjs.com/generating-provenance-statements) of each version with it, which links the package to the workflow run and the commit it was built from; the npm page of the package shows it. `publishConfig` in `package.json` makes the package public and asks for this provenance.
 
 To release a version:
 
-1. **A pull request for the release**, from a branch such as `release/0.1.0`. It changes the version with `npm version 0.1.0 --no-git-tag-version`, which writes `package.json` and `package-lock.json`. In the CHANGELOG, it renames `## [Unreleased]` to `## [0.1.0] - YYYY-MM-DD`, with the day of the release, and adds an empty `## [Unreleased]` above it. It also updates what the README says about the published version. Merge it once the CI passes.
+1. **A pull request for the release**, from a branch such as `release/0.1.0`. It changes the version with `npm version 0.1.0 --no-git-tag-version`, which writes `package.json` and `package-lock.json`, then runs `npm run build:action` to update the version embedded in the shipped action. In the CHANGELOG, it renames `## [Unreleased]` to `## [0.1.0] - YYYY-MM-DD`, with the day of the release, and adds an empty `## [Unreleased]` above it. It also updates what the README says about the published version and the examples in `docs/`. Include the generated action files and merge once the CI passes.
 2. **The tag**, on the merged commit of `main`:
 
    ```sh
@@ -259,6 +283,7 @@ npm never allows a version number to be used again, even after it is removed. To
 | [README.md](README.md) | Theme authors | Every way to run it, the options and exit codes, how to read the report, the CI, the API, the limits, how to uninstall |
 | [docs/checks.md](docs/checks.md) | Theme authors | Every check, its keys, its minimum and its references |
 | [docs/report-format.md](docs/report-format.md) | CI and scripts | The JSON report, field by field |
+| [docs/github-action.md](docs/github-action.md) | Theme authors and maintainers | Action inputs, outputs, demonstration, fixed versions, Marketplace publication and removal |
 | [CHANGELOG.md](CHANGELOG.md) | Everyone | The changes of each release |
 | This file | Contributors | How the package follows VS Code, and how it is tested |
 

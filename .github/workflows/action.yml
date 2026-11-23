@@ -1,0 +1,63 @@
+# The action as shipped: these jobs do not install npm dependencies or rebuild it before calling it.
+# Its source tests and reproducibility check also run in CI through npm run check.
+name: GitHub Action
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  action:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Passing themes, in strict mode
+        id: passing
+        uses: ./
+        with:
+          path: test/data/365
+          strict: 'true'
+
+      - name: A failure with a visible exception
+        id: failing
+        continue-on-error: true
+        uses: ./
+        with:
+          path: test/data/oracle-extension/themes/dark.json
+          config: test/data/action/config.json
+
+      - name: A configuration error
+        id: error
+        continue-on-error: true
+        uses: ./
+        with:
+          path: test/data/365
+          config: missing-action-config.json
+
+      # Node is only needed for the verification script below; the action above provides its own runtime.
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Check the results and the saved reports
+        env:
+          PASS_OUTCOME: ${{ steps.passing.outcome }}
+          PASS_CODE: ${{ steps.passing.outputs.exit-code }}
+          PASS_REPORT: ${{ steps.passing.outputs.report-path }}
+          FAIL_OUTCOME: ${{ steps.failing.outcome }}
+          FAIL_CODE: ${{ steps.failing.outputs.exit-code }}
+          FAIL_REPORT: ${{ steps.failing.outputs.report-path }}
+          ERROR_OUTCOME: ${{ steps.error.outcome }}
+          ERROR_CODE: ${{ steps.error.outputs.exit-code }}
+          ERROR_REPORT: ${{ steps.error.outputs.report-path }}
+        run: node scripts/action-ci.ts

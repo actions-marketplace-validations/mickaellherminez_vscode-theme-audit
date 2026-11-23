@@ -6,6 +6,8 @@ Accessibility audit for VS Code color themes, for theme authors and their CI: WC
 
 > **Status: first releases (0.1).** Planned next: auditing a `.vsix` file or an Open VSX id, a configuration file, and a GitHub Action ([milestones](https://github.com/mickaellherminez/vscode-theme-audit/milestones)).
 
+The `.vsix` and Open VSX inputs, configuration, Markdown report and GitHub Action below are **unreleased changes for 0.2.0**. npm 0.1.2 does not include them. Until that release, use the [sources](#from-the-sources) for the command, and the action workflow in this repository for its demonstration.
+
 ## Where it comes from
 
 The audit was first written for [365 Day & Night](https://github.com/mickaellherminez/365-daynight-vscode-theme-ext), a set of 48 VS Code themes, where it runs before each release and publishes [its report](https://github.com/mickaellherminez/365-daynight-vscode-theme-ext/blob/main/docs/AUDIT.md). That version only reads the themes of its own project. This package makes it read any VS Code color theme, the way VS Code does.
@@ -64,6 +66,7 @@ vscode-theme-audit open-vsx:publisher.name                # the latest version o
 vscode-theme-audit open-vsx:publisher.name@1.2.3          # a version of it
 vscode-theme-audit ext-one ext-two/themes/night.json      # several at once
 vscode-theme-audit path/to/my-extension --json > audit.json   # the report as JSON, for CI
+vscode-theme-audit path/to/my-extension --format markdown > audit.md  # a PR comment or job summary
 vscode-theme-audit path/to/my-extension --strict          # the rules of 365 Day & Night
 ```
 
@@ -78,6 +81,7 @@ Each argument is a theme file, an extension folder, a `.vsix` file or an Open VS
 | Option | Effect |
 | --- | --- |
 | `--json` | Prints the report as JSON instead of text: format 1, described by [`schema/report-v1.schema.json`](schema/report-v1.schema.json), which the package contains. It gives every check, not only the failures. See [The JSON report](#the-json-report) |
+| `--format text\|json\|markdown` | Chooses the report format. Text is the default; `--json` remains an alias for `--format json`. Markdown is for PR comments and job summaries. Both `--format markdown` and `--format=markdown` work. Contradictory choices are an error (exit code `2`) |
 | `--strict` | Applies the rules of 365 Day & Night (see [Strict mode](#strict-mode)) |
 | `--config <file>` | Uses this configuration for every theme, instead of the `.vscode-theme-audit.json` of each extension folder (see [Configuration](#configuration)) |
 | `-h`, `--help` | Shows the help |
@@ -152,9 +156,46 @@ To fix a failure, change the color named in the line: a check named `foreground 
 
 A check fails when its `status` is `"fail"` and it has no `"information": true`, or, in strict mode, when its `status` is `"missing"`. The values are not rounded. Every field is described in [docs/report-format.md](docs/report-format.md), and the schema [`schema/report-v1.schema.json`](schema/report-v1.schema.json) (JSON Schema 2020-12) can validate a report. New fields can appear in format 1; a field removed or changing meaning gives format 2, with a new schema.
 
+## The Markdown report
+
+`--format markdown` prints the audit as GitHub Markdown: the result and complete totals, the tool and VS Code versions, the mode, a table of themes, then failures, confused pairs by vision, configuration and ignored reasons, warnings, unreadable themes and strict variety. Missing colors outside strict mode, missing styles and achromatopsia remain information. The exit codes are the same as for text and JSON.
+
+The report is limited to 60,000 UTF-8 bytes, so it fits a PR comment and a job summary. If details do not fit, a notice says so; the global totals still cover the complete audit. Use JSON for every result. Theme names, warnings and exception reasons are escaped, including mentions. The command only prints the Markdown; it does not post a PR comment. For a local report, redirect it to `audit.md`; remove that file when it is no longer needed. To return to text, remove `--format markdown` or use `--format text`.
+
 ## In a CI
 
-A GitHub Actions job that audits the themes of the repository on each push and pull request, and keeps the JSON report as an artifact:
+### GitHub Action
+
+The action in this repository embeds the audit engine and its dependencies. After checkout it audits the theme extension, writes its Markdown report in the job summary, and fails the step on audit failures or errors. It uses the GitHub Actions Node.js 24 runtime; no npm installation or `setup-node` step is needed for the action. [Full inputs, outputs, demonstration, versioning and removal](docs/github-action.md).
+
+The following workflow pins the reviewed **development commit** `a37f9fc4e1e5743c16ce569eaa657ad3fb7466ce`, which contains the unreleased action. It is not an npm release. When 0.2.0 is released, choose its reviewed full commit SHA to use that release; npm 0.1.2 and the existing 0.1 tags do not contain the action.
+
+```yaml
+name: Theme audit
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: mickaellherminez/vscode-theme-audit@a37f9fc4e1e5743c16ce569eaa657ad3fb7466ce
+        with:
+          path: '.'
+          # Optional; false by default
+          strict: 'false'
+          # Optional; otherwise the extension's configuration is discovered
+          # config: .vscode-theme-audit.json
+```
+
+`path` accepts one theme file, extension folder, `.vsix` or Open VSX id as a literal value. An Open VSX id downloads the extension; local inputs need no network access from the audit engine. `strict` is `true` or `false`; `config` is a configuration file relative to the checked-out workspace. The action needs no secret and does not post comments or change the theme files. Delete its step to remove it, or its workflow if the workflow serves only this audit.
+
+The [public action test](.github/workflows/action-public.yml) uses that exact SHA from a checkout containing only test themes, their configuration and the report assertions. It checks public action download separately from the [three-system demonstration](.github/workflows/action.yml), which tests the current commit's action.
+
+### The published command
+
+A job using the current npm release, auditing the themes on each push and pull request, and keeping the JSON report as an artifact:
 
 ```yaml
 name: Theme audit
@@ -265,12 +306,14 @@ The command does not show the origin yet; the API gives it (see below).
 The package exports its engine, with its TypeScript types. The main functions:
 
 ```ts
-import { auditInputs, auditPaths, auditTheme, exitCode, isFailure, loadTheme, packageVersion, textReport } from 'vscode-theme-audit';
+import { auditInputs, auditPaths, auditTheme, exitCode, isFailure, loadTheme, markdownReport, packageVersion, textReport } from 'vscode-theme-audit';
 
 // What the command does: a report in the JSON format, the text report and the exit code. auditInputs takes
 // what the command takes, .vsix files and Open VSX ids included
 const report = await auditInputs(['path/to/my-extension', 'my-theme-1.2.3.vsix'], { version: packageVersion(), strict: false });
 console.log(textReport(report));
+// For a PR comment body or job summary; this only produces the text
+const markdown = markdownReport(report);
 process.exitCode = exitCode(report);
 
 // The same for theme files and extension folders only, without waiting
@@ -320,6 +363,8 @@ Before version 1.0.0, the API can change in any release, as [Semantic Versioning
 | From the sources | Delete the clone |
 
 To remove it from a CI, delete the steps that run it (or the whole workflow file, such as `.github/workflows/theme-audit.yml` in the example above), and the artifact step if you kept the JSON report. Nothing else is left: the command writes nothing on disk except the report you redirect, and a temporary folder for a `.vsix` or an Open VSX id, deleted before it ends. It uses the network only to download an `open-vsx:` id.
+
+The GitHub Action also keeps a Markdown copy in the runner temporary folder for the rest of the job (`report-path`), alongside the job summary. GitHub manages those job files; a self-hosted runner's owner manages its cleanup. Removing the workflow does not delete summaries or artifacts of earlier runs.
 
 ## Development
 

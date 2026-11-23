@@ -54,14 +54,18 @@
     "test": "node --test \"test/*.test.ts\"",
     "corpus": "node scripts/corpus.ts",
     "test:corpus": "node scripts/corpus.ts && node --test \"test/corpus/*.test.ts\"",
-    "check": "npm run lint && npm run typecheck && npm test && npm run build && node --test \"test/package/*.test.ts\"",
-    "test:package": "npm run build && node --test \"test/package/*.test.ts\""
+    "check": "npm run lint && npm run typecheck && npm test && npm run build && node --test \"test/package/*.test.ts\" && npm run check:action && npm run test:action",
+    "test:package": "npm run build && node --test \"test/package/*.test.ts\"",
+    "build:action": "node scripts/action.ts",
+    "check:action": "node scripts/action.ts --check",
+    "test:action": "node --test \"test/action-package/*.test.ts\""
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^22.20.5",
     "@types/yauzl": "^2.10.3",
     "ajv": "^8.20.0",
+    "esbuild": "0.28.2",
     "eslint": "^10.15.0",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.73.0",
