@@ -1376,7 +1376,7 @@ var require_yauzl = __commonJS({
 // package.json
 var package_default = {
   name: "vscode-theme-audit",
-  version: "0.1.2",
+  version: "0.2.0",
   description: "Accessibility audit for VS Code color themes: WCAG contrast and color blindness simulations, for theme authors and CI.",
   keywords: [
     "vscode",

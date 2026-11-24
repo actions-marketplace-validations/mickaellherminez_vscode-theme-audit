@@ -4,9 +4,9 @@
 
 Accessibility audit for VS Code color themes, for theme authors and their CI: WCAG contrast of the text and the code, and color pairs that must stay distinct with color blindness simulations.
 
-> **Status: first releases (0.1).** Planned next: auditing a `.vsix` file or an Open VSX id, a configuration file, and a GitHub Action ([milestones](https://github.com/mickaellherminez/vscode-theme-audit/milestones)).
+> **Status: early releases (0.2).** Version 0.2.0 adds `.vsix` and Open VSX inputs, configuration, Markdown reports and a GitHub Action ([milestones](https://github.com/mickaellherminez/vscode-theme-audit/milestones)).
 
-The `.vsix` and Open VSX inputs, configuration, Markdown report and GitHub Action below are **unreleased changes for 0.2.0**. npm 0.1.2 does not include them. Until that release, use the [sources](#from-the-sources) for the command, and the action workflow in this repository for its demonstration.
+These documents describe version **0.2.0**. If npm does not serve this version yet, run the [sources](#from-the-sources) to try the command; the versioned npm examples below become available when 0.2.0 is published. The action workflows in this repository demonstrate its GitHub Action independently of npm publication.
 
 ## Where it comes from
 
@@ -100,7 +100,7 @@ Outside strict mode, a color that VS Code does not show, and the styles of WCAG 
 The text report starts with the version of the package and of VS Code whose colors it uses. Then, for each theme, its name, its type and its file, followed by one line per problem. This is an excerpt of the report of a test theme of this repository (`test/data/oracle-extension/themes/dark.json`), which sets few colors:
 
 ```text
-vscode-theme-audit 0.1.2, colors of VS Code 1.147.0
+vscode-theme-audit 0.2.0, colors of VS Code 1.147.0
 
 Oracle Dark (vs-dark): test/data/oracle-extension/themes/dark.json
   FAIL     Line numbers: #858585 on #1B2230  4.32 < 4.5
@@ -133,14 +133,14 @@ To fix a failure, change the color named in the line: a check named `foreground 
 ```jsonc
 {
   "format": 1,                                   // the version of this format
-  "tool": { "name": "vscode-theme-audit", "version": "0.1.2" },
+  "tool": { "name": "vscode-theme-audit", "version": "0.2.0" },
   "vscode": { "version": "1.147.0", "commit": "8a14f0cc1b08d531eb83255ea3764ae22aa932b5" },
   "strict": false,
   "minimumDeltaE2000": 7,
   "warnings": [],                                // about the extensions: their package.json and colors
   "themes": [{
     "label": "Oracle Dark", "file": "test/data/oracle-extension/themes/dark.json", "uiTheme": "vs-dark", "warnings": [],
-    "summary": { "checks": 263, "failed": 16, "missing": 8, "information": 7, "pairs": 148, "confused": 84 },
+    "summary": { "checks": 263, "failed": 16, "missing": 8, "information": 7, "pairs": 148, "confused": 84, "ignored": 0 },
     "checks": [
       { "label": "Line numbers", "value": 4.317608886674965, "minimum": 4.5, "status": "fail", "colors": ["#858585", "#1B2230"] }
     ],
@@ -154,7 +154,7 @@ To fix a failure, change the color named in the line: a check named `foreground 
 }
 ```
 
-A check fails when its `status` is `"fail"` and it has no `"information": true`, or, in strict mode, when its `status` is `"missing"`. The values are not rounded. Every field is described in [docs/report-format.md](docs/report-format.md), and the schema [`schema/report-v1.schema.json`](schema/report-v1.schema.json) (JSON Schema 2020-12) can validate a report. New fields can appear in format 1; a field removed or changing meaning gives format 2, with a new schema.
+A check fails when it has neither `"information": true` nor `ignored`, and its `status` is `"fail"` (or `"missing"` in strict mode). The values are not rounded. Every field is described in [docs/report-format.md](docs/report-format.md), and the schema [`schema/report-v1.schema.json`](schema/report-v1.schema.json) (JSON Schema 2020-12) can validate a report. New fields can appear in format 1; a field removed or changing meaning gives format 2, with a new schema.
 
 ## The Markdown report
 
@@ -168,7 +168,7 @@ The report is limited to 60,000 UTF-8 bytes, so it fits a PR comment and a job s
 
 The action in this repository embeds the audit engine and its dependencies. After checkout it audits the theme extension, writes its Markdown report in the job summary, and fails the step on audit failures or errors. It uses the GitHub Actions Node.js 24 runtime; no npm installation or `setup-node` step is needed for the action. [Full inputs, outputs, demonstration, versioning and removal](docs/github-action.md).
 
-The following workflow pins the reviewed **development commit** `a37f9fc4e1e5743c16ce569eaa657ad3fb7466ce`, which contains the unreleased action. It is not an npm release. When 0.2.0 is released, choose its reviewed full commit SHA to use that release; npm 0.1.2 and the existing 0.1 tags do not contain the action.
+The following workflow pins the reviewed **0.2.0 action code** at commit `0f287bd6b42642f5c5f5d1c5e8c497630f695a57`. That commit embeds engine version 0.2.0 and can run independently of npm publication. A full SHA fixes the action code; changing it is an explicit update.
 
 ```yaml
 name: Theme audit
@@ -180,7 +180,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: mickaellherminez/vscode-theme-audit@a37f9fc4e1e5743c16ce569eaa657ad3fb7466ce
+      - uses: mickaellherminez/vscode-theme-audit@0f287bd6b42642f5c5f5d1c5e8c497630f695a57
         with:
           path: '.'
           # Optional; false by default
@@ -195,7 +195,7 @@ The [public action test](.github/workflows/action-public.yml) uses that exact SH
 
 ### The published command
 
-A job using the current npm release, auditing the themes on each push and pull request, and keeping the JSON report as an artifact:
+A job for version 0.2.0, once it is available on npm, auditing the themes on each push and pull request and keeping the JSON report as an artifact:
 
 ```yaml
 name: Theme audit
@@ -208,8 +208,8 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 22
-      - run: npx --yes vscode-theme-audit@0.1.2 .
-      - run: npx --yes vscode-theme-audit@0.1.2 . --json > theme-audit.json
+      - run: npx --yes vscode-theme-audit@0.2.0 .
+      - run: npx --yes vscode-theme-audit@0.2.0 . --json > theme-audit.json
         if: always()
       - uses: actions/upload-artifact@v7
         if: always()
@@ -218,7 +218,7 @@ jobs:
           path: theme-audit.json
 ```
 
-The first step fails the job when a check fails (exit code `1`) or a theme cannot be read (`2`). Give a fixed version (`@0.1.2`), so that a new release of the package, with new checks or the colors of a newer VS Code, does not change the result of a commit. With the package in `devDependencies`, `npm ci` then `npx vscode-theme-audit .` uses the version of `package-lock.json`.
+The first step fails the job when a check fails (exit code `1`) or a theme cannot be read (`2`). Give a fixed version (`@0.2.0`), so that a new release of the package, with new checks or the colors of a newer VS Code, does not change the result of a commit. With the package in `devDependencies`, `npm ci` then `npx vscode-theme-audit .` uses the version of `package-lock.json`.
 
 ## Configuration
 
@@ -322,7 +322,7 @@ const local = auditPaths(['path/to/my-extension'], { version: packageVersion() }
 // One theme, with its type: 'vs' (light), 'vs-dark', 'hc-black' or 'hc-light'
 const audit = auditTheme(loadTheme('themes/my-theme.json'), 'vs-dark');
 audit.checks.filter((check) => isFailure(check));             // checks under their minimum
-audit.distinctions.filter((pair) => pair.status === 'fail'); // colors that a vision confuses
+audit.distinctions.filter((pair) => isFailure(pair));        // colors that a vision confuses, except ignored pairs
 ```
 
 The origin of each workbench color:

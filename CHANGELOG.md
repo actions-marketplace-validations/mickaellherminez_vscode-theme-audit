@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-24
+
 ### Added
 - `--format text|json|markdown` selects the report renderer, with text as the default and `--json` kept as an alias for `--format json`. The Markdown report and `markdownReport()` API give the complete totals, failed checks, confused pairs, configuration and ignored reasons, warnings, errors and strict variety. Details are limited to 60,000 UTF-8 bytes with an explicit truncation notice; theme data is escaped and mentions are neutralized. Contradictory format options fail with exit code 2 ([#18](https://github.com/mickaellherminez/vscode-theme-audit/issues/18)).
 - A JavaScript GitHub Action with its engine and dependencies bundled, running with Node.js 24: inputs `path`, `strict`, `config`; a Markdown job summary even on audit failures; outputs `report-path` and `exit-code`. Its demonstration workflow uses the existing test themes in this repository on Linux, Windows and macOS, without a separate example repository. A separate Ubuntu workflow calls the public action at a reviewed full commit SHA from a checkout containing only fixtures and report assertions, verifying download, success and expected failures. CI checks the shipped bundle against the sources and runs it from an isolated folder without npm dependencies. The README and action guide explain usage, fixed commit references, removal and the owner's Marketplace publication steps. Live workflow results and the Marketplace listing require validation on GitHub; the source change alone does not establish them ([#18](https://github.com/mickaellherminez/vscode-theme-audit/issues/18)).
