@@ -19,7 +19,7 @@ The report of a test theme of this repository, with each list cut to one entry:
 ```json
 {
   "format": 1,
-  "tool": { "name": "vscode-theme-audit", "version": "0.1.2" },
+  "tool": { "name": "vscode-theme-audit", "version": "0.2.0" },
   "vscode": { "version": "1.147.0", "commit": "8a14f0cc1b08d531eb83255ea3764ae22aa932b5" },
   "strict": false,
   "minimumDeltaE2000": 7,
@@ -30,7 +30,7 @@ The report of a test theme of this repository, with each list cut to one entry:
       "file": "test/data/oracle-extension/themes/dark.json",
       "uiTheme": "vs-dark",
       "warnings": [],
-      "summary": { "checks": 263, "failed": 16, "missing": 8, "information": 7, "pairs": 148, "confused": 84 },
+      "summary": { "checks": 263, "failed": 16, "missing": 8, "information": 7, "pairs": 148, "confused": 84, "ignored": 0 },
       "checks": [
         { "label": "Line numbers", "value": 4.317608886674965, "minimum": 4.5, "status": "fail", "colors": ["#858585", "#1B2230"] }
       ],
@@ -99,7 +99,7 @@ The report of a test theme of this repository, with each list cut to one entry:
 | `ignored` | string | Present only on checks that the configuration ignores: its reason. They are never failures |
 | `colors` | [string, string] | Present when both colors exist: the text and the background as shown, opaque, after a transparent color is composed on what is under it |
 
-A check is a failure when its `status` is `"fail"` and it has neither `information` nor `ignored`, or, in strict mode, when its `status` is `"missing"` without `ignored`. This is `isFailure(check, strict)` in the API. The `minimum` of a check is the threshold of the configuration, when it changes the default one.
+A check is a failure when it has neither `information: true` nor `ignored`, and its `status` is `"fail"` (or `"missing"` in strict mode). This is `isFailure(check, strict)` in the API. The `minimum` of a check is the threshold of the configuration, when it changes the default one.
 
 ## A pair
 
@@ -140,7 +140,7 @@ Strict mode only: the themes of one type in an extension compared with each othe
 With [jq](https://jqlang.org/), the failed checks of each theme:
 
 ```sh
-vscode-theme-audit . --json | jq -r '.themes[] | .label as $t | .checks[]? | select(.status == "fail" and (.information | not)) | "\($t): \(.label) \(.value) < \(.minimum)"'
+vscode-theme-audit . --json | jq -r '.strict as $strict | .themes[] | .label as $t | .checks[]? | select((.information | not) and (.ignored | not) and (.status == "fail" or ($strict and .status == "missing"))) | "\($t): \(.label) \(.value) < \(.minimum)"'
 ```
 
 With Node.js:
@@ -151,7 +151,7 @@ import { readFileSync } from 'node:fs';
 const report = JSON.parse(readFileSync('theme-audit.json', 'utf8'));
 if (report.format !== 1) throw new Error(`Unknown report format ${report.format}`);
 for (const theme of report.themes) {
-  const confused = new Set(theme.distinctions?.filter((d) => d.status === 'fail').map((d) => d.pair.join(' / ')));
+  const confused = new Set(theme.distinctions?.filter((d) => d.status === 'fail' && d.ignored === undefined).map((d) => d.pair.join(' / ')));
   console.log(theme.label, theme.summary?.failed ?? 'unreadable', [...confused]);
 }
 ```

@@ -1,6 +1,6 @@
 # GitHub Action
 
-The action is part of the unreleased 0.2.0 work. The current npm release, 0.1.2, and its Git tags do not contain it. The action is JavaScript with the audit engine and dependencies bundled in `action/dist/index.cjs`; it runs with the GitHub Actions Node.js 24 runtime. The bundled engine follows the code at the chosen action commit, independently of which npm version is installed in the caller's project.
+The action is included in the 0.2.0 sources. It is JavaScript with the audit engine and dependencies bundled in `action/dist/index.cjs`, running with the GitHub Actions Node.js 24 runtime. It can run from a reviewed public commit before the corresponding npm release is published. The bundled engine follows the code at the chosen action commit, independently of which npm version is installed in the caller's project.
 
 ## Run it
 
@@ -61,7 +61,7 @@ The normal CI separately checks the source tests, that the bundle and licenses m
 
 The [public action test](../.github/workflows/action-public.yml) calls `mickaellherminez/vscode-theme-audit@a37f9fc4e1e5743c16ce569eaa657ad3fb7466ce` for the same three cases on Ubuntu. Its non-cone sparse checkout contains only the fixtures, their configuration and the assertion script. A guard checks that the local action metadata, bundle, engine sources and `node_modules` are absent: GitHub must download the action at the public SHA. No new repository is created. This targeted download check complements the three-system local-action demonstration above. Inspect its actual GitHub summary after the workflow runs; adding this file alone does not establish that the run passed.
 
-The public test records one fixed revision, while the local-action demonstration always tests the candidate commit. To check another public version, first push and review its action commit, then update all three `uses` references in the public test and the matching SHA references in the README, this guide and CONTRIBUTING. Run the workflow and inspect its summary. Restore the previous references to go back. Before a Marketplace listing, verify that these references and the resulting check identify the intended action version.
+The public test records one fixed revision, while the local-action demonstration always tests the candidate commit. To check another public version, commit and review the action changes, then update all three `uses` references in the public test and the matching SHA references in the README, this guide and CONTRIBUTING. Both commits can be pushed together; GitHub can then download the reviewed action commit from the branch history. Run the workflow and inspect its summary. Restore the previous references to go back. Before a Marketplace listing, verify that these references and the resulting check identify the intended action version.
 
 ## Publication on the Marketplace
 
