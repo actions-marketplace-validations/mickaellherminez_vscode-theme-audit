@@ -168,7 +168,7 @@ The report is limited to 60,000 UTF-8 bytes, so it fits a PR comment and a job s
 
 The action in this repository embeds the audit engine and its dependencies. After checkout it audits the theme extension, writes its Markdown report in the job summary, and fails the step on audit failures or errors. It uses the GitHub Actions Node.js 24 runtime; no npm installation or `setup-node` step is needed for the action. [Full inputs, outputs, demonstration, versioning and removal](docs/github-action.md).
 
-The following workflow pins the reviewed **development commit** `a37f9fc4e1e5743c16ce569eaa657ad3fb7466ce`, which contains the unreleased action. It is not an npm release. When 0.2.0 is released, choose its reviewed full commit SHA to use that release; npm 0.1.2 and the existing 0.1 tags do not contain the action.
+The following workflow pins the reviewed **0.2.0 action code** at commit `0f287bd6b42642f5c5f5d1c5e8c497630f695a57`. That commit embeds engine version 0.2.0 and can run independently of npm publication. A full SHA fixes the action code; changing it is an explicit update.
 
 ```yaml
 name: Theme audit
@@ -180,7 +180,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: mickaellherminez/vscode-theme-audit@a37f9fc4e1e5743c16ce569eaa657ad3fb7466ce
+      - uses: mickaellherminez/vscode-theme-audit@0f287bd6b42642f5c5f5d1c5e8c497630f695a57
         with:
           path: '.'
           # Optional; false by default
