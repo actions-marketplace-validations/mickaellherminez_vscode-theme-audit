@@ -44,7 +44,7 @@ jobs:
       REQUESTED: ${{ inputs.version || 'latest' }}
     steps:
       # Only for the sample themes: the package itself comes from npm
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
         with:
           sparse-checkout: test/data/365
 
