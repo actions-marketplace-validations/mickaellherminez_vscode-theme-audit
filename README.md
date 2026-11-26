@@ -1,6 +1,14 @@
-# vscode-theme-audit
+<h1 align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset=".github/assets/readme-banner-dark.svg">
+    <img src=".github/assets/readme-banner-light.svg" alt="vscode-theme-audit: accessibility audit for Visual Studio Code color themes" width="640">
+  </picture>
+</h1>
 
-[![npm version](https://img.shields.io/npm/v/vscode-theme-audit)](https://www.npmjs.com/package/vscode-theme-audit)
+<p align="center">
+  <a href="https://www.npmjs.com/package/vscode-theme-audit"><img alt="npm version" src="https://img.shields.io/npm/v/vscode-theme-audit?color=0B7F7A"></a>
+  <a href="https://github.com/mickaellherminez/vscode-theme-audit/actions/workflows/ci.yml?query=branch%3Amain"><img alt="CI status" src="https://img.shields.io/github/actions/workflow/status/mickaellherminez/vscode-theme-audit/ci.yml?branch=main&amp;label=CI&amp;color=0B7F7A"></a>
+</p>
 
 Accessibility audit for Visual Studio Code color themes, for theme authors and their CI: WCAG contrast of the text and the code, and color pairs that must stay distinct with color blindness simulations.
 
