@@ -238,6 +238,12 @@ The [public action workflow](.github/workflows/action-public.yml) verifies downl
 
 To update the public test, commit and review the action changes, then replace all three public `uses` references and the matching SHA references in the README, action guide and this file with that commit's full SHA. The action commit and the reference update can be pushed together: the referenced commit is then in the branch history before the workflow starts. Rerun the workflow and inspect the actual job summary. Restore the previous references to go back. Before the first Marketplace listing, verify that the public test names the intended version and has passed. The owner publishes the listing on github.com; see [the action guide](docs/github-action.md#publication-on-the-marketplace) for requirements, the release/tag interaction and removal. Never create a version tag merely to test the listing: it triggers the npm release workflow.
 
+## Pilot with theme authors
+
+Follow the [pilot protocol](docs/pilot.md) for issue #19. It fixes the four feedback questions, records the audited input and tool version, and separates the corpus baseline from actual author feedback. Participant records, reports, contact details and replies stay outside the public repository and public CI artifacts. Only aggregated findings and the resulting decision belong in the public summary.
+
+An invitation asks for participation and a private delivery channel before sharing a report. Keep drafts local until the maintainer authorizes outreach; do not post audit results in public issue trackers. A verified problem can become a separate, reproducible issue after removing identifying details or obtaining permission. The protocol also explains withdrawal and how to remove an optional audit workflow.
+
 ## Releases
 
 Versions are published to npm only by the [release workflow](.github/workflows/release.yml), when a version tag is pushed. npm authenticates the workflow with OpenID Connect ([trusted publishing](https://docs.npmjs.com/trusted-publishers)): no npm token is stored in the repository. npm publishes the [provenance](https://docs.npmjs.com/generating-provenance-statements) of each version with it, which links the package to the workflow run and the commit it was built from; the npm page of the package shows it. `publishConfig` in `package.json` makes the package public and asks for this provenance.
@@ -284,10 +290,13 @@ npm never allows a version number to be used again, even after it is removed. To
 | [docs/checks.md](docs/checks.md) | Theme authors | Every check, its keys, its minimum and its references |
 | [docs/report-format.md](docs/report-format.md) | CI and scripts | The JSON report, field by field |
 | [docs/github-action.md](docs/github-action.md) | Theme authors and maintainers | Action inputs, outputs, demonstration, fixed versions, Marketplace publication and removal |
+| [docs/pilot.md](docs/pilot.md) | Pilot participants and maintainers | Private reports, shared questions, aggregate findings, completion and withdrawal |
 | [CHANGELOG.md](CHANGELOG.md) | Everyone | The changes of each release |
 | This file | Contributors | How the package follows VS Code, and how it is tested |
 
 The examples of the README and of `docs/` are real outputs of the command on the test themes of `test/data/oracle-extension/`: after a change of the checks or of the report, run the command again and update them. The README is published on npm with the package, and links to the other files of the repository.
+
+The last section of the README, `Trademarks`, names the author and attributes the trademarks of other owners that the README uses. When the README starts naming another product, add its attribution there, in the wording that its owner publishes, as a paragraph of its own, and follow any rule of that owner for the text itself (the README writes "Eclipse Open VSX™" at its first and most prominent mentions, as the Eclipse Foundation asks); remove an attribution when the README no longer names the product. To go back, delete the section: it does not change the package or the action. The npm page shows the README of the latest published version, so a change there appears on npm with the next release.
 
 ## Pull requests
 
